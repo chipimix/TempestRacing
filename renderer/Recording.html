@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="UTF-8">
+    <title id="versionSpan">Tempest Racing MASTR 0.6.5</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="../scripts/d3.v5.min.js"></script>
+    <script src="Recording.js"></script>
+    <script src="../scripts/ui.js"></script>
+</head>
+<body style="overflow:hidden; width: calc(100vw - (100vw - 100%)); height:100vh;margin:0;background:linear-gradient(to right, #337540, #003832, #337540, #003832, #337540);user-select: none;">
+<div class="alert">
+    <div class="hamburger-btn" onclick="toggleMenu(this)">
+        <div id="menu-bar1"></div>
+        <div id="menu-bar2"></div>
+        <div id="menu-bar3"></div>
+        <div style="top: 1px;left: 3.3vw;position: absolute">Menu </div>
+    </div>
+    <div id="dragMe"></div>
+    <div>
+        <a id="alert_txt">🔥 Welcome to EMOTAI® Tempest 🔥</a>
+    </div>
+</div>
+<div id="mySidenav" style="/*width = 0;*/ height:100%;   margin-top: 2vh;" class="sidenav">
+    <a href="#" onclick="toggleHelper();" id="start_btn"><img class="menuImg" src="../images/menu_icons/start.png">Start</a>
+    <a href="#" onclick="gameReport();"  id="report_btn" style="display:none;"><img class="menuImg" src="../images/menu_icons/report.png">Stop Recording</a>
+    <a href="#" onclick="showProgress();" style="padding-right:0;"><img class="menuImg" src="../images/menu_icons/progress.png">Progress History</a>
+    <a href="#" onclick="openTrainingsMockup();"><img class="menuImg" src="../images/menu_icons/trainings.png">Trainings</a>
+    <a onclick="toggleSettings();"><img class="menuImg" src="../images/menu_icons/settings.png">Settings</a>
+    <!--        <a onclick="toggleHelper();"><img class="menuImg" src="../images/menu_icons/help.png">Help</a>-->
+    <a onclick="openBrowser('https://www.notion.so/Tempest-guides-1a0c2fc41548412c9c4f212fc0a80248')"><img class="menuImg" src="../images/menu_icons/help.png">Help</a>
+    <a onclick="ipcRenderer.send('metricFAQ')" class="accordion"><img class="menuImg" src="../images/menu_icons/about.png">FAQ</a>
+    <a href="mailto:support@emotai.tech" class="accordion"><img class="menuImg" src="../images/menu_icons/contacts.png">Contact us!</a>
+    <a onclick="quit();"><img class = "menuImg" src="../images/menu_icons/exit.png">Exit</a>
+
+</div>
+<div id="main" class="noLive" style="display: none;">
+    <div id="chart1Dropdown" style="position: absolute;height: 5%;left: calc(50vw - 95px);z-index: 3;"></div>
+
+    <svg id="CHART1" class="lineChart" viewBox="0 0 1278 172" preserveAspectRatio="xMinYMin meet"></svg>
+    <div id="chart2Dropdown" style="position: absolute;height: 5%;left: calc(50vw - 95px);z-index: 2;"></div>
+
+    <svg id="CHART2" class="lineChart" viewBox="0 0 1278 172" preserveAspectRatio="xMinYMin meet"></svg>
+    <div id="historyDomain" class="btn-group" style="background-color: rgba(0, 0, 0, 0.7); padding-top: 2px; width: 100vw; height: 7vh; display: none;">
+        <button onclick='plotter.plotProgressChart("#CHART2", progressData ,1, d3.select("#chart2Dropdown").select("text").text().trim(), 1218.8, 133.849756097561);
+                         plotter.plotProgressChart("#CHART1", progressData ,1, d3.select("#chart1Dropdown").select("text").text().trim(), 1218.8, 133.849756097561);
+                         plotter.plotProgressScrollZoomBar("CHART1", progressData, "Engagement",d3.select("#CHART1").select(".dataLine").attr("d"), "pink",1218.8, 133.849756097561,[recordsProgress[0],recordsProgress[recordsProgress.length-1]]);
+                         handleProgressMouseInteraction()
+'>Overall</button>
+        <button onclick='plotter.plotProgressChart("#CHART2", progressData ,1, d3.select("#chart2Dropdown").select("text").text().trim(), 1218.8, 133.849756097561,[recordsProgress[recordsProgress.length-1]- 2592000000,recordsProgress[recordsProgress.length-1].getTime()]);
+                         plotter.plotProgressChart("#CHART1", progressData ,1, d3.select("#chart1Dropdown").select("text").text().trim(), 1218.8, 133.849756097561,[recordsProgress[recordsProgress.length-1]- 2592000000,recordsProgress[recordsProgress.length-1].getTime()]);
+                         plotter.plotProgressScrollZoomBar("CHART1", progressData, "Engagement",d3.select("#CHART1").select(".dataLine").attr("d"), "pink",1218.8, 133.849756097561,[new Date(recordsProgress[recordsProgress.length-1]- 2592000000),recordsProgress[recordsProgress.length-1]]);
+                         handleProgressMouseInteraction()
+'>1 Month</button>
+        <button onclick='plotter.plotProgressChart("#CHART2", progressData ,1, d3.select("#chart2Dropdown").select("text").text().trim(), 1218.8, 133.849756097561,[recordsProgress[recordsProgress.length-1]- 604800000,recordsProgress[recordsProgress.length-1].getTime()]);
+                         plotter.plotProgressChart("#CHART1", progressData ,1, d3.select("#chart1Dropdown").select("text").text().trim(), 1218.8, 133.849756097561,[recordsProgress[recordsProgress.length-1]- 604800000,recordsProgress[recordsProgress.length-1].getTime()]);
+                         plotter.plotProgressScrollZoomBar("CHART1", progressData, "Engagement",d3.select("#CHART1").select(".dataLine").attr("d"), "pink",1218.8, 133.849756097561,[new Date(recordsProgress[recordsProgress.length-1]- 86400000*7),recordsProgress[recordsProgress.length-1]]);
+                         handleProgressMouseInteraction()
+'>1 Week</button>
+        <button onclick='plotter.plotProgressChart("#CHART2", progressData ,1, d3.select("#chart2Dropdown").select("text").text().trim(), 1218.8, 133.849756097561,[recordsProgress[recordsProgress.length-1]- 86400000,recordsProgress[recordsProgress.length-1].getTime()]);
+                         plotter.plotProgressChart("#CHART1", progressData ,1, d3.select("#chart1Dropdown").select("text").text().trim(), 1218.8, 133.849756097561,[recordsProgress[recordsProgress.length-1]- 86400000,recordsProgress[recordsProgress.length-1].getTime()]);
+                         plotter.plotProgressScrollZoomBar("CHART1", progressData, "Engagement",d3.select("#CHART1").select(".dataLine").attr("d"), "pink",1218.8, 133.849756097561,[new Date(recordsProgress[recordsProgress.length-1]- 86400000),recordsProgress[recordsProgress.length-1]]);
+                         handleProgressMouseInteraction();
+'>24 Hours</button>
+    </div>
+    <svg id = "scrollBarContainer" width = "100vw" height="7vh"  style="background-color:rgba(0,0,0,0.7); padding-top:2px;" viewBox="0 0 1277 50" preserveAspectRatio="xMinYMin meet"></svg>
+    <div id="progressInspector">
+        Loading Race Recap...<br>
+    </div>
+    <video poster="../images/load.gif" preload="none" id="screen" width="38%" height="40.4%" muted>
+    </video>
+    <video poster="../images/icons8-webcam-90.png"  preload="none" id="camera" width = "38%" height = "40.4%" muted></video>
+    <div class="btn-group" id="gameRecapBtn" style="position:absolute;bottom:0;display:none;">
+        <button onclick="deleteRecord();">Delete Record</button>
+        <button onclick="showProgress();">Progress History</button>
+    </div>
+
+
+</div>
+<div id="live">
+    <span  class="pulse">
+                <svg id="brain" class="rt_status" width="30vw" height="30vw" data-name="Camada 1" version="1.1" viewBox="0 0 201 201" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <style>.cls-1{fill:none;}.cls-2{fill:#00ffb0;}.cls-3{fill:#05b075;}</style>
+                    </defs>
+                    <g  fill="#00ffb0">
+                        <path id="right_brain" class="cls-2" d="m164.08 79.213a27.39 27.39 0 0 1-39.12-38.21 2.6346 2.6346 0 1 1 4 3.43 22.15 22.15 0 0 0 31.57 30.9 2.61 2.61 0 0 1 3.7 0.19 2.64 2.64 0 0 1-0.19 3.69m-2 49.31a2.63 2.63 0 0 1-3.7 0.28 22.15 22.15 0 0 0-30.81 31.62 2.62 2.62 0 0 1-1.95 4.38
+                        2.51 2.51 0 0 1-1.92-0.86 27.38 27.38 0 0 1 38.19-39.1 2.6 2.6 0 0 1 0.28 3.68m18.81-53.36a16 16 0 0 0-4.79-11.43l-1.9-1.9a16 16 0 0 0-11.41-4.74 16.18 16.18 0 0 0-6.91 1.55 8.82 8.82 0 0 1-11.27-3.23 8.73 8.73 0 0 1-0.6-8.43l0.19-0.43a16.21 16.21 0 0 0-3.31-18l-1.83-1.82a16 16 0
+                        0 0-11.43-4.74h-4a16 16 0 0 0-9 2.76l-10.56 7.1v66.88h20.32l-20.32 38.08v34.09l9.95 6.7a18.47 18.47 0 0 0 10.35 3.13h2.26a18.56 18.56 0 0 0 16.78-26.48 8.09 8.09 0 0 1 0.47-7.9 8.37 8.37 0 0 1 10.36-3.15l2 0.9a16.15 16.15 0 0 0 18.06-3.33l1.82-1.81a16.17 16.17 0 0 0-2.09-24.64 15.92
+                        15.92 0 0 1 0-26 16.2 16.2 0 0 0 6.85-13.2"/>
+                        <path id="outer_brain" class="cls-2" d="m177.08 110.07a21.41 21.41 0 0 1 2.77 32.66l-1.83 1.82a21.24 21.24 0 0 1-15.12 6.18 21.55 21.55 0 0 1-8.77-1.86l-2-0.9a3 3 0 0 0-3.8 1.16 2.85 2.85 0 0 0-0.15 2.87 23.78 23.78 0 0 1-21.53 33.95h-2.26a23.67 23.67 0 0 1-13.28-4l-9.67-6.49-10.25
+                        6.89a21.24 21.24 0 0 1-11.95 3.64h-4a21.29 21.29 0 0 1-15.08-6.26l-1.84-1.83a21.52 21.52 0 0 1-4.38-23.89l0.19-0.44a3.51 3.51 0 0 0-0.24-3.44 3.65 3.65 0 0 0-4.62-1.34 21 21 0 0 1-9.14 2 21.3 21.3 0 0 1-15.13-6.25l-1.89-1.9a21.41 21.41 0 0 1 2.77-32.61 10.67 10.67 0 0 0 0-17.44 21.4
+                        21.4 0 0 1-2.77-32.6l1.83-1.84a21.43 21.43 0 0 1 23.89-4.39l2 0.89a3 3 0 0 0 3.79-1.16 2.93 2.93 0 0 0 0.16-2.86 23.89 23.89 0 0 1 4.69-27 23.65 23.65 0 0 1 16.84-7h2.22a23.78 23.78 0 0 1 13.29 4l9.65 6.5 10.25-6.89a21.26 21.26 0 0 1 11.96-3.51h4a21.3 21.3 0 0 1 15.13 6.26l1.83 1.82a21.51
+                        21.51 0 0 1 4.38 23.9l-0.18 0.43a3.51 3.51 0 0 0 0.22 3.44 3.68 3.68 0 0 0 4.64 1.35 21.36 21.36 0 0 1 24.24 4.21l1.91 1.91a21.19 21.19 0 0 1 6.27 15.12 21.43 21.43 0 0 1-9 17.48 10.68 10.68 0 0 0 0 17.44m12.68-8.72a36.3 36.3 0 0 0 11.21-26.2 36.59 36.59 0 0 0-10.62-25.63l-1.9-1.89a36
+                        36 0 0 0-22.86-10.51 36.38 36.38 0 0 0-10.46-22.81l-1.82-1.81a35.9 35.9 0 0 0-22.64-10.49h-10a36 36 0 0 0-17.25 6l-2 1.32-1.41-0.94a38.43 38.43 0 0 0-18.46-6.41h-8.37a38.79 38.79 0 0 0-24.28 11.17 38.36 38.36 0 0 0-11.18 24 36 36 0 0 0-23.32 10.56l-1.81 1.81a36.22 36.22 0 0 0 0.59 51.82
+                        36.24 36.24 0 0 0-11.21 26.2 36.2 36.2 0 0 0 10.62 25.63l1.88 1.89a36 36 0 0 0 22.87 10.52 36.46 36.46 0 0 0 10.44 22.81l1.84 1.81a35.94 35.94 0 0 0 25.63 10.63h4a36.24 36.24 0 0 0 20.24-6.2l2-1.33 2 1.34a36.24 36.24 0 0 0 20.21 6.17h4a36 36 0 0 0 25.63-10.63l1.89-1.88a36.29 36.29 0
+                        0 0 10.49-22.82 36 36 0 0 0 22.78-10.51l1.83-1.83a36.07 36.07 0 0 0 10.62-25.62 36.13 36.13 0 0 0-11.21-26.19"/>
+                        <path id="left_brain" class="cls-2" d="m54.526 116.51a27.37 27.37 0 0 1 23.41 45.14 2.58 2.58 0 0 1-2 0.92 2.51 2.51 0 0 1-1.7-0.64 2.57 2.57 0 0 1-0.27-3.69 22.15 22.15 0 0 0-31.64-30.9 2.56 2.56 0 0 1-1.75 0.69 2.62 2.62 0 0 1-1.76-4.56 27.25 27.25 0 0 1 15.69-7m-13.69-42.36a2.61
+                        2.61 0 0 1 3.69-0.27 21.93 21.93 0 0 0 14.49 5.39 22.14 22.14 0 0 0 16.41-37 2.62 2.62 0 0 1 3.89-3.51 27.39 27.39 0 0 1-38.21 39.11 2.61 2.61 0 0 1-0.27-3.69m58 29.83h-20.35l20.35-38.08v-34.1l-10-6.69a18.35 18.35 0 0 0-10.29-3.16h-2.26a18.42 18.42 0 0 0-13.13 5.44 18.63 18.63 0 0
+                        0-3.67 21 8.06 8.06 0 0 1-0.46 7.9 8.39 8.39 0 0 1-10.36 3.14l-2-0.89a15.86 15.86 0 0 0-6.61-1.44 16 16 0 0 0-11.43 4.76l-1.8 1.88a16 16 0 0 0-4.73 11.42 16.26 16.26 0 0 0 6.81 13.21 15.87 15.87 0 0 1 0 26 16.19 16.19 0 0 0-2.11 24.65l1.9 1.9a16.14 16.14 0 0 0 18.32 3.18 8.71 8.71
+                        0 0 1 3.82-0.87 8.92 8.92 0 0 1 7.43 4.1 8.66 8.66 0 0 1 0.63 8.42l-0.19 0.45a16.23 16.23 0 0 0 3.31 18l1.83 1.84a16.15 16.15 0 0 0 11.46 4.7h4a15.81 15.81 0 0 0 9-2.76l10.58-7.11v-66.88z"/>
+                    </g>
+                </svg>
+    </span>
+
+    <svg   id="PPGLive" width="100%"  height="22vh" style="background-color:rgba(0,0,0,0);bottom: 0.25vw;position: absolute;">
+        <text id="bpm_text" x="50%" Y="20%" text-anchor="middle" style="text-shadow: 1px 2px 3px #666;fill:#00ffb0; font-size:4.2vh;"> </text>
+    </svg>
+
+</div>
+<div id = "guideMenu" class="noLive">
+    <div style="width: 49.6%;height:100%;float: left;border-color: #00ffb0;border-right-style: dashed;">
+        <object type="image/svg+xml" id="guideSearch" data="../images/magnifyingGlassAnimation.svg" style="margin: 3vh 6vw 0vh 6vw;color:lightgray;">
+            Your browser does not support SVG
+        </object>
+        <div class="brightness">
+            <img id="guideStart" src="../images/play.png" style="display:none;  margin: 11vh 8vw 8vh; width: 40%;color:lightgray;">
+        </div>
+        <div id="leftGuideMenuText" >
+            <p>Searching for Headband...</p>
+            <p>Make sure your previously connected device is charged and turned on. </p>
+            <p><a href="https://www.notion.so/Tempest-guides-1a0c2fc41548412c9c4f212fc0a80248" style="color:#00ffb0;">Problems connecting? </a> </p>
+        </div>
+        <div class="helperMenuBtn" style="bottom: 2%; position:absolute"  onclick="startSWRecording(false);">
+            Proceed without headband
+        </div>
+    </div>
+    <div id="importGuide" style="width: 49.9%;height:100%;float: right;cursor:pointer;">
+        <object type="image/svg+xml" data="../images/import.svg" style="margin: 7vh 9vw 6vh 9vw; color:lightgray;cursor:pointer;">
+            Your browser does not support SVG
+        </object>
+        <input  id="myfile2" name="myFile"  onclick="showProgress();" style="width: 100%;height: 100%;display: block;top: -44.5%;z-index:2;position: relative;opacity: 0;cursor:pointer;">
+
+        <div id="rightGuideMenuText" style="float: right; cursor: pointer; position: absolute; top: 43%; width: 40%; margin: 2vh 2vw;">
+            <p>Previous Game Progress History</p>
+        </div>
+    </div>
+</div>
+<div id="settingsMenu">
+    <table style="margin: 0 auto;">
+        <tbody>
+
+            <tr>
+                <td>Camera Recording</td>
+                <td>
+                    <div class="dropdown">
+                        <button id="cameraGrabDropbtn" class="dropbtn" onclick="onOffHandler(this)" >Enabled ▼
+                            <div class="dropdown-content">
+                                <a onclick="setRecordingDevices(this)">Enabled</a>
+                                <a onclick="setRecordingDevices(this)">Disabled</a>
+                            </div>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="float:right">Organization:</td>
+                <td style="padding-left: 20px" id="orgId"></td>
+            </tr>
+            <tr>
+                <td style="float:right">Selected Racer:</td>
+                <td style="padding-left: 20px" id="usrId"></td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="racerUI"></div>
+    <div style="position: absolute;bottom: 10px;margin-left: -25%;width: 50%;left: 50%;">
+        <button type="button" onclick="applySettings(recordCamera,username);" style="width: 47%; padding: 12px 16px; margin-top:12px;">Apply</button>
+        <button type="button" onclick="cancelSettings();" style="width: 47%;padding: 12px 16px;margin-top:12px;">Cancel</button>
+    </div>
+</div>
+<div id="trainingPage" >
+    <div class="trainingsBanner" style="left:2.5%;">
+        Muscle Relaxation
+        <img src="../images/muscle.png" style="width:50%;margin-top:25%;">
+    </div>
+    <div class="trainingsBanner" style="left:35%;">
+        Breathing Exercise
+        <div class="orb orb_1">
+        </div>
+    </div>
+    <div class="trainingsBanner" style="left:67.5%;">
+        Mental Focus
+        <img src="../images/focus.png" style="    width: 45%;
+                 margin-top: 15%;margin-left:10%;margin-right:10%;">
+
+    </div>
+    <div style="position: absolute;color: white;font-size: -webkit-xxx-large;font-family: sans-serif;font-weight: bolder;background-color: rgb(20,20,20);text-align: center;margin: 7% 0; width: 100%;">Coming Soon</div>
+    <audio controlsList="nodownload" controls style="position: absolute;margin: 3% 0%;width: 16.7%;left: 41.3%;top: 80%;">
+        <source src=" https://elasticbeanstalk-eu-west-1-446251264147.s3-eu-west-1.amazonaws.com/trainings_audio/Music5MinuteBreathing.mp3 " type="audio/mpeg">
+    </audio>
+</div>
+<div id="loading">
+    <img src="../images/loadingLightning.gif" style="display: block;margin-left: auto;margin-right: auto;padding-top: 5%;">  </div>
+</body>
+</html>
