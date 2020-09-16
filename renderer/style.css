@@ -1,0 +1,618 @@
+/*
+    sidenav menu
+*/
+
+.sidenav {
+    /*height: 100vw; !* 100% Full-height *!*/
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 4; /* Stay on top */
+    top: 0;
+    left: 0;
+    background-color: #111; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    overflow-y:hidden;
+    padding-top: 5.5vh; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+/* The navigation menu links */
+.sidenav a {
+    padding: 2.2vh 8px 16px 4px;
+    text-decoration: none;
+    font-size: 1.2em;
+    color: lightgray;
+    display: block;
+    font-family: 'Raleway-bold';
+    margin-left: 0.4vw;
+    opacity: 0;
+
+
+}
+.upload-btn-wrapper input[type=file] {
+    position: absolute;
+    left: 0;
+    margin-top: -3vh;
+    width: 100%;
+    height: 10vh;
+    opacity: 0;
+}
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover, .offcanvas a:focus{
+    color: rgb(0,255,176);
+}
+.menu {
+    text-align: center;
+    color: lightgray;
+    position: fixed;
+    display: block;
+    top: 6px;
+    font-family: 'Raleway-bold';
+    font-size: 3.6vh;
+    /* border-style: inset; */
+    /* margin: 0.25vw 0px 5px 0px; */
+    background-color: #111;
+    /* background-image: url(images/menu.svg); */
+    background-size: cover;
+    z-index: 1;
+    transition: 0.3s;
+    padding-right: 0.2em;
+}
+.hamburger-btn {
+    position: fixed;
+    width: 9vw;
+    height: 5.4vh;
+    color: #31312f;
+    font-family: 'Raleway-bold';
+    font-size: 4vh;
+    background-color: #00ffb0;
+    cursor: pointer;
+    z-index:3;
+}
+
+#menu-bar1, #menu-bar2, #menu-bar3 {
+    width: 2.73vw;
+    height: 0.7vh;
+    background-color: #31312f;
+    margin: 6px 6px;
+    transition: 0.4s;
+}
+
+.menuImg{
+    height: 0.8em;
+    top:0.1em;
+    margin-right:1vw;
+    margin-left:0.3em;
+    position:relative;
+}
+
+/* Rotate first bar */
+.change #menu-bar1 {
+    -webkit-transform: rotate(-45deg) translate(-9px, 0.46875vw);
+    transform: rotate(-45deg) translate(-9px, 0.46875vw);
+}
+
+/* Fade out the second bar */
+.change #menu-bar2 {
+    opacity: 0;
+}
+
+/* Rotate last bar */
+.change #menu-bar3 {
+    -webkit-transform: rotate(45deg) translate(-8px, -0.46875vw);
+    transform: rotate(45deg) translate(-8px, -0.46875vw);
+}
+/*
+    alert style
+*/
+
+/* The alert message box */
+.alert {
+    /* background-color: #31312f; */
+    color: #00ffb0;
+    top: 0.25vh;
+    width: 100%;
+    position: fixed;
+    z-index: 5;
+}
+
+
+#dragMe{
+    -webkit-app-region: drag;
+    left: 14.5%;
+    width: 85.5%;
+    z-index: 3;
+    height: 5vh;
+    position: absolute;
+}
+.alert a {
+    padding: 0.7vh 0vw;
+    font-size: 2.7vh;
+    font-family: sans-serif;
+    text-align: center;
+    display: block;
+    /* top: 1.5vh; */
+    width: calc(100vw - (100vw - 100%));
+    height: 3.9vh;
+    position: relative;
+    background: #31312f;
+}
+
+
+
+/* main */
+#main{
+    height: 93.6vh;
+    width: 100vw;
+    background-color: rgba(0,0,0,0.2);
+    margin-top: 3px;
+    max-width: 100%;
+    top: 5.4vh;
+    position: absolute;
+}
+
+/* guide menu*/
+#guideMenu{
+    width: 52.8vw;
+    height: 84vh;
+    top: 6.5vh;
+    left: 23.6vw;
+    border-style: solid;
+    border-color: #00ffb0;
+    position: absolute;
+    font-weight: 900;
+    font-family: sans-serif;
+    background-color:rgb(49,49,47);
+    color: lightgray;
+    z-index: 4;
+}
+
+#settingsMenu{
+    z-index: 4;
+    width: 32.8vw;
+    padding:10vh 10vw;
+    height: 64vh;
+    top: 6.5vh;
+    left: 23.6vw;
+    border-style: solid;
+    border-color: #00ffb0;
+    position: absolute;
+    font-weight: 900;
+    font-family: sans-serif;
+    background-color: rgb(49,49,47);
+    color: lightgray;
+    display:none;
+}
+
+
+.dropbtn {
+    background-color: #31312f;
+    color: lightgray;
+    font: 16px sans-serif;
+    /* border: none; */
+    padding: 12px 0px;
+    margin-left: 16px;
+
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #000000;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+
+}
+
+.dropdown-content a {
+    color: lightgray;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font: 16px sans-serif;
+    background: #31312f;
+}
+
+/*
+    linechart class
+*/
+.lineChart{
+    height: 24vh;
+    width: 100%;
+    background: rgba(0,0,0,0.7);
+    margin-bottom:2px;
+    display:block;
+}
+
+
+/* fonts */
+@font-face {
+    font-family: 'Raleway-bold';
+    font-weight: bold;
+    src:
+            local('bold'),
+            url(../fonts/bold.otf) format('opentype');
+}
+
+.btn {
+    border: 2px rgba(0,0,0,0.5);
+    background-color: rgba(255,255,255,0.1);
+    color: whitesmoke;
+    padding: 14px 28px 14px 7px;
+    font-size: 16px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.btn:hover{
+    background-color: rgba(255,255,255,0.7);
+
+}
+#importGuide:hover{
+    background-color: #4b4b48;
+
+}
+
+#screen{
+    background-color: rgba(0,0,0,0.7);
+    left: 23.6vw;
+    bottom: -2px;
+    position: absolute;
+    display:inline-block;
+}
+#camera{
+    background-color:rgba(0,0,0,0.7);
+    display:inline-block;
+    position: absolute;
+    bottom: -2px;
+    right: 2px;
+}
+
+#leftGuideMenuText{
+    margin: 2vh 2vw;
+    position: absolute;
+    top: 43%;
+    width: 40%;
+    height: 41%;
+}
+#deviceList{
+    height: 68%;
+
+    margin-right: -20px;
+    overflow: auto;
+}
+#racerList{
+    height: 30vh;
+    overflow: auto;
+    list-style-type: none;
+    padding: 0;
+    margin: 0 -20px 10px 0;
+}
+
+#racerList li a {
+    border: 1px solid #ddd; /* Add a border to all links */
+    margin-top: -1px; /* Prevent double borders */
+    background-color: #f6f6f6; /* Grey background color */
+    padding: 12px; /* Add some padding */
+    text-decoration: none; /* Remove default text underline */
+    font-size: 18px; /* Increase the font-size */
+    color: black; /* Add a black text color */
+    display: block; /* Make it into a block element to fill the whole list */
+}
+
+#racerList li a:hover:not(.header) {
+    background-color: #eee; /* Add a hover effect to all links, except for headers */
+}
+#searchRacer {
+    background-image: url('../images/searchicon.png'); /* Add a search icon to input */
+    background-position: 10px 12px; /* Position the search icon */
+    background-size: 2.5vh;
+    padding-left: 5vh;
+    background-repeat: no-repeat; /* Do not repeat the icon image */
+    width: calc(100% - 5vh); /* Full-width */
+    height: 5vh;
+    font-size: 16px; /* Increase font-size */
+    border: 1px solid #ddd; /* Add a grey border */
+    margin: 12px 0;
+}
+/* live anim stuff : */
+#addRacerInput{
+    padding-left: 1vh;
+    width: 68%; /* Full-width */
+    height: 5vh;
+    font-size: 16px; /* Increase font-size */
+    border: 1px solid #ddd; /* Add a grey border */
+    margin-bottom: 12px; /* Add some space below the input */
+}
+.pulse {
+    display: inline-block;
+    width: 2px;
+    height: 2px;
+    fill:#00ffb0;
+    color:#00ffb0;
+    opacity:0.8;
+    border-radius: 50%;
+    margin-top:9vh;
+    background: rgba(0,255,176,1);
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(0,255,176, 1);
+    z-index:1;
+    position:absolute;
+    left:50vw;
+    top:13.5vw;
+    animation: pulse 9s infinite;
+}
+
+#brain{
+    animation: brain_anim 3s  infinite linear;
+    top:-15vw;
+    z-index:1;
+    position:relative;
+    left:-15vw;
+    background-color:rgba(0,0,0,0);
+}
+
+@keyframes pulse {
+    0% {
+        background: rgba(0,255,176,0);
+        -moz-box-shadow: 0 0 0 0vw rgba(0,255,176, 0);
+        box-shadow: 0 0 0 0vw rgba(0,255,176, 0);
+    }
+    10% {
+        background: rgba(0,255,176,0.1);
+        -moz-box-shadow: 0 0 0 15vw rgba(0,255,176, 0.1);
+        box-shadow: 0 0 0 15vw rgba(0,255,176, 0.1);
+    }
+    100% {
+        background: rgba(0,255,176,0);
+        -moz-box-shadow: 0 0 0 60vw rgba(0,255,176, 0);
+        box-shadow: 0 0 0 60vw rgba(0,255,176, 0);
+    }
+}
+
+@keyframes brain_anim
+{
+    0%
+    {
+        opacity: 0.6;
+        transform: scale( .9 );
+
+    }
+    50%
+    {
+        opacity:0.9;
+        transform: scale( 1);
+
+    }
+    100%
+    {
+        opacity: 0.6;
+        transform: scale( 0.9);
+
+    }
+
+}
+
+#live{
+    position: absolute;
+    background: rgba(49,49,47,0.7);
+    height: 94.25vh;
+    width: 99.5%;
+    left: 0.25vw;
+    right: 0.25vw;
+    bottom: 0.25vw;
+    z-index: -1;
+}
+.zoom {
+    cursor: move;
+    fill: none;
+    pointer-events: all;
+}
+.inspection{
+    font-size: 2vh;
+
+}
+text{
+    /*fill:#00ffb0;*/
+    /*font-size:1.48vh;*/
+    font-family:'Raleway';
+    paint-order: stroke;
+    stroke: #000000;
+    stroke-width: 2px;
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+    font-weight: 800;
+
+}
+
+@font-face {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: normal;
+    src:
+            local('raleway-v12-latin-regular'),
+            url(../fonts/raleway-v12-latin-regular.woff2) format('woff2');
+}
+
+#trainingPage{
+    width:100vw;
+    height:100vh;
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    display:none;
+}
+
+.orb {
+    height: 100px;
+    width: 100px;
+    border-radius: 100px;
+    background: rgba(0,255,176,0.7);
+    margin: auto;
+    margin-top:30%;
+}
+
+.orb_1 {
+    animation-name:orb_1;
+    animation-duration: 5s;
+    animation-delay: 0s;
+    animation-iteration-count:infinite;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+}
+
+@keyframes orb_1 {
+    from { transform: scale(1); background: #00ffb0;}
+    to { transform: scale(3);}
+}
+.trainingsBanner{
+    background-color: rgba(0,0,0,0.7);
+    font-family: 'Raleway-bold';
+    font-size: 5vh;
+    height:100%;
+    width:30%;
+    position:absolute;
+    top:0;
+    padding-top: 200px;
+    color:#00ffb0;
+    text-align: center;
+}
+.trainingsBanner:hover{
+    background-color: #4b4b48;
+
+}
+
+.metricPickerContainer{
+    font-family: 'Raleway-bold';
+    display: inline-block;
+    height: 33.5%;
+    width: 15.6%;
+    background-color: rgba(0,0,0,0.7);
+    font-size: 20px;
+    padding-bottom: 2.1%;
+    padding-left: 4vw;
+    color: #00ffb0;
+
+}
+
+
+.helperMenuBtn{
+    width: 38%;
+    /*bottom: 2%;*/
+    background-color: rgba(255,255,255,0.1);
+    text-align: center;
+    /*position: absolute;*/
+    color:whitesmoke;
+    left: 4%;
+    padding: 14px 28px 14px 7px;
+    cursor: pointer;
+}
+.helperMenuBtn:hover{
+    background-color: rgba(255,255,255,0.7);
+}
+#retryConn{
+    width: 90.5%;
+}
+
+#progressInspector{
+    width: 23.2vw;
+    height: 37.7vh;
+    display: inline-block;
+    position: absolute;
+    margin-left: 2px;
+    margin-bottom: -2px;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.7);
+    font-family: monospace;
+    color: lightgray;
+    font-size: 1vw;
+}
+#progressInspector p{
+    margin: 0;
+    margin-left: 1vw;
+}
+#progressViewMode{
+    width: 29.8%;
+    height: 33.5%;
+    /* display: inline-block; */
+    margin-left: 7px;
+    position: absolute;
+    left: 49.8%;
+    bottom: 5px;
+    background-color: rgba(0,0,0,0.7);
+}
+#loading{
+    display:none;
+    background-color:#01040cff;
+    width:100%;
+    height:100%;
+    z-index: 3; /* Stay on top */
+    position: relative;
+
+}
+
+.btn-group button {
+    background-color: rgba(0,0,0,0.2); /* Green background */
+    border: 1px solid #31312f; /* Green border */
+    color: lightgray; /* White text */
+    padding: 1.6vh 2.145vw; /* Some padding */
+    cursor: pointer; /* Pointer/hand icon */
+    float: left; /* Float the buttons side by side */
+    margin-left: 2px;
+    font-size: 1.04vw;
+    background-color: rgba(0,0,0,0.2);
+    border: 1px solid #31312f;
+    color: lightgray;
+    padding: 1.6vh 2.15vw;
+    cursor: pointer; /* Pointer/hand icon */
+    float: left; /* Float the buttons side by side */
+    margin-left: 1px;
+}
+
+.btn-group button:not(:last-child) {
+    border-right: none; /* Prevent double borders */
+}
+
+/* Clear floats (clearfix hack) */
+.btn-group:after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+/* Add a background color on hover */
+.btn-group button:hover {
+    background-color: #31312f;
+    color:#00ffb0;
+}
+/* Style the close button */
+.close {
+    float: right;
+    padding: 12px 16px 12px 16px;
+    margin-top: -12px;
+}
+
+.close:hover {
+    background-color: #f44336;
+    color: white;
+}
+/* Style the "Add" button */
+.addBtn {
+    padding: 10px;
+    width: 25%;
+    background: #d9d9d9;
+    color: #555;
+    float: left;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 0;
+}
+
+.addBtn:hover {
+    background-color: #bbb;
+}
