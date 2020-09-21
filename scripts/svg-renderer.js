@@ -55,7 +55,7 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
         svg.append("defs").append("clipPath")
             .attr("id", "clip" + svg_id.slice(1))
             .append("rect")
-            .attr("height", "24vh")
+            .attr("height", "95%")
             .attr("width", "95.22%")
         // append x axis:
         console.log("[SESSIONS] xAxis height : "+height)
@@ -98,6 +98,7 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
                     return d3.timeFormat('%M:%S')(new Date(0).setSeconds(d))
                 }));
         //update y axis
+        console.log("plotLineChart update yAxis domain = "+domain)
         d3.select(svg_id).select(".yAxis")
             .call(d3.axisLeft(d3.scaleLinear().domain(domain).range([height, 0])))
         //erased lines below as we should only need to do this once
@@ -148,7 +149,7 @@ function plotRtLineChart(svg_id, dataset, sampleRate, xxDomainStart = 0, xxDomai
         svg.append("defs").append("clipPath")
             .attr("id", "clip" + svg_id.slice(1))
             .append("rect")
-            .attr("height", "24vh")
+            .attr("height", "95%")
             .attr("width", "95.22%")
         // append x axis:
         svg.append("g")
@@ -255,7 +256,7 @@ function plotProgressChart(svg_id, dataset, sampleRate, name = "Chart", width, h
         g.append("defs").append("clipPath")
             .attr("id", "clip" + svg_id.slice(1))
             .append("rect")
-            .attr("height", "24vh")
+            .attr("height", "95%")
             .attr("width", "95.22%");
         g.append("g")
             .attr("class", "yAxis")
@@ -306,7 +307,7 @@ function plotProgressChart(svg_id, dataset, sampleRate, name = "Chart", width, h
         g.select(".dataLine").datum(dataset).attr("d", line);
         g.select(".xAxis")
             .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%d %b - %I:%M")).ticks(7))
-        g.select(".yAxis")
+        g.selectAll(".yAxis")
             .call(d3.axisLeft(d3.scaleLinear().domain(domain).range([height, 0])));
         g.selectAll(".dot").data(dataset)
             .attr("cx", function (d) {
@@ -627,14 +628,21 @@ function zoomed() {
         } else {
             metricName = d3.select("#chart1Dropdown").select("g").select("g").text().slice(0, -1).trim();
         }
-        let domain = [100, 0]
-        console.log(metricName)
+        // var name = d3.select("#" + id).select("text").text();
+        let scale = d3.scaleLinear().domain([dataMax,dataMin]).range([100, 0])
+        let domain = [scale(d3.max(data)), scale(d3.min(data))]
         if (metricName == "Heart Rate" || metricName == "Creep Score" || metricName == "Gold" || metricName == "Actions Per Minute" || metricName == "HRV") {
+
+            // if(metricName == "Heart Rate" ){
             domain = [d3.max(data), d3.min(data)];
         } else if (metricName == "Emotional Valence") {
-            domain = [1, -1]
+            scale = d3.scaleLinear().domain([dataMax,dataMin]).range([1, -1])
+            domain = [scale(d3.max(data)),scale(d3.min(data))]
         }
+
+
         d3.select("#" + id).select(".yAxis").call(d3.axisLeft(d3.scaleLinear().domain(domain).range([0, height])));
+        console.log("zoomed yAxis domain = "+domain)
     });
 
     d3.selectAll(".brush").call(brush.move, xRAW_wide.range().map(t.invertX, t));
@@ -734,7 +742,7 @@ function brushed() {
 
 
         d3.select("#" + id).select(".yAxis").call(d3.axisLeft(d3.scaleLinear().domain(domain).range([0, height])));
-
+        console.log("brushed yAxis domain = "+domain)
     });
 
 

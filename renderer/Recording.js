@@ -175,7 +175,7 @@ communicationEmitter.on("firstCommRcvd",()=>{
     // vidGrab.startMediaRecording(recordName,true,screen.width/4,screen.height/4,4,true,1280,720,4 );
     vidGrab.startMediaRecording(recordName,true,854,480,1,recordCamera,854,480,1 );
     fs.appendFile('readings/'+ recordName+"_derived.csv",["Engagement,Stress,Emotional Valence,Heart Rate,HRV,APM,Mouse Moves,Fatigue,Sleepiness,Focus,Memory Load"].toString()+"\n",function (err){
-        if(err) throw err;
+        if(err) throw err;3
     });
     updateHeaderText(" 🎥   Recording... 🎥 ")
     //hide menu start button:
