@@ -7,24 +7,43 @@ let reference;
 let prevThreeHRV = [];
 let hrvRef;
 
-let ppgData = [];
-let danyPeaks = [];
-let joaquimPeaks = [];
-let squary = [];
-let devs = [];
-let rawPPG = [];
-let refs = [];
+// let ppgData = [];
+// let danyPeaks = [];
+// let joaquimPeaks = [];
+// let squary = [];
+// let devs = [];
+// let rawPPG = [];
+// let refs = [];
 
+// Declare array to save all Peaks that have been detected in the recording
 let allallPeaks;
+
+// Declare array to save all Peaks that are relevant for the HRV analysis (subset of allallPeaks)
+let allRelevantPeaks;
+
+// INT that counts the complete windows we have been through. Needed to organise all the peaks
+// since the same peak appears multiple times across various windows due to the overlap
 let w = 0;
+
+// BOOL to check if it's the first full window being analysed
 let firstWindow = true;
 
+// Size of the window for HRV analysis in seconds
 let hrvWindow = 15
-let threshold = hrvWindow-6;
-let z = 0;
-let overlap = 0.2;
 
+// The value that W should reach for the first HRV analysis
+// Since w only increases after the first full PPG window has been analysed, w=1 only after 6 seconds of recording
+let threshold = hrvWindow-6;
+
+// INT to move the sliding window of the peaks to be considered
+let z = 0;
+
+// Overlap between consecutive sliding windows for HRV analysis
+let overlap = 14/15;
+
+// Index of the last peak detected in the window being currently analysed
 let lastPeak;
+
 
 function deriveHr(signal){
 
@@ -148,19 +167,26 @@ function deriveHr(signal){
         }
     }
 
-    ppgData.push(outFiltered);
-    danyPeaks.push(foundPeaks);
-    joaquimPeaks.push(newFoundPeaks);
-    squary.push(ppgIrFilteredThrsd);
-    devs.push(ppgSSFThreshd);
-    rawPPG.push(signal);
+    // ppgData.push(outFiltered);
+    // danyPeaks.push(foundPeaks);
+    // joaquimPeaks.push(newFoundPeaks);
+    // squary.push(ppgIrFilteredThrsd);
+    // devs.push(ppgSSFThreshd);
+    // rawPPG.push(signal);
 
+    // Saves all the PPG peaks that have been detected until now in an array
+    // First, we wait until we have a full window (6.5 seconds of data)
     if (ppgIrFiltered.length == 650) {
+        // If that window is the first one to be analysed
         if (firstWindow) {
+            // Our array with all the peaks will start with the peaks of the first full window
             allallPeaks = JSON.parse(JSON.stringify(newFoundPeaks));
             firstWindow = false;
             w++;
         } else {
+            // If it is not the first window, we need to find the peaks that are only from the new PPG window
+            // Since each PPG window has a 1 second slide, 5 of those seconds overlap with the previous window
+            // So most peaks have already been detected
             let morePeaks = newFoundPeaks.filter(element => element > lastPeak-100+15);
             morePeaks = morePeaks.map(element => (100*w) + element);
             allallPeaks.push(...morePeaks);
@@ -168,41 +194,41 @@ function deriveHr(signal){
         }
     }
 
+    // Identifies the last peak that has been detected
     lastPeak = newFoundPeaks[newFoundPeaks.length-1];
 
-    // if (w == Math.max(threshold + z*Math.floor((1-overlap)*hrvWindow) + 1, z+1)) {
-    //DoSomething
-    // console.log('HERE WE GO!')
-    // allRelevantPeaks = allallPeaks.filter(element =>  z*Math.floor((1-overlap)*hrvWindow) >= element/100 >= Math.floor((1-overlap)*hrvWindow) + z*Math.floor((1-overlap)*hrvWindow));
-    // z++;
-    // }
+    // Check if we need a new analysis based on the specified constants
+    // There are 2 case scenarios in the Math.max.
+    // The first one works when the slide is higher than 1 second -> threshold + z*Math.floor((1-overlap)*hrvWindow) + 1
+    // The second one works when the slide is lower than 1 second -> threshold + z + 1
 
-    // console.log(allRelevantPeaks);
-    // console.log(allallPeaks);
+    if (ppgIrFiltered.length < 650) {
 
-    // Compute time difference between consecutive peaks
-    let hr = [];
-    for(i=0; i<newFoundPeaks.length-1; i++){
-        hr.push(newFoundPeaks[i+1]-newFoundPeaks[i]);
+        allRelevantPeaks = JSON.parse(JSON.stringify(newFoundPeaks));
+
+    }  else if (w < threshold + 1) {
+
+        allRelevantPeaks = JSON.parse(JSON.stringify(allallPeaks));
+
+    }  else if (w == Math.max(threshold + z*Math.floor((1-overlap)*hrvWindow) + 1, threshold + z + 1)) {
+        // Define the time where the analysis starts in seconds
+        let step = Math.max(z*Math.floor((1-overlap)*hrvWindow), z);
+
+        // Filter all the relevant peaks for the current analysis
+        allRelevantPeaks = allallPeaks.filter(element =>  hrvWindow + step >= element/100 && element/100 >= step);
+        z++;
     }
 
-    // Compute the median value of the computed intervals
-    let standardInt = d3.median(hr);
-
-    // Remove the intervals that are clearly outliers based on the median value
-    hr = hr.filter(item => 1.33*standardInt >= item && item >= 0.66*standardInt);
-
-    // Compute RMSSD
-    var hrv = Math.sqrt(d3.mean(hr.slice(1).map(function(element, idx) {return Math.pow((element - hr[idx])*10, 2)})));
-
     // Compute HR
-    hr = d3.mean(hr)*10 //hr in milliseconds
-    hr = 60000/hr; // hr in bpms
+    let hr = computeHR(newFoundPeaks);
 
-    refs.push([hr, hrv, reference, hrvRef]);
+    // Compute HRV
+    let hrv = computeHRV(allRelevantPeaks);
+
+    // refs.push([hr, hrv, reference, hrvRef]);
 
     // If the HR value is abnormal, apply an heuristic to correct it
-    if(hr <= 45 || isNaN(hr) || hr >= 200 || Math.abs(hr - reference) > 30) {
+    if(hr <= 45 || isNaN(hr) || hr >= 200 || hr - reference > 20) {
         let noise = d3.deviation(prevFive);
         // Trade the abnormal value for a reference plus a small random variation
         // The randomness helps preventing the system from getting stuck in extreme cases
@@ -218,9 +244,9 @@ function deriveHr(signal){
     }
 
     // Apply the same reasoning but for HRV
-    if (/*hrv <= 10 ||*/ isNaN(hrv)  || hrv >= 120 || Math.abs(hrv - hrvRef) > 35) {
+    if (/*hrv <= 10 ||*/ isNaN(hrv)  || hrv >= 120 || hrv - hrvRef > 20 || hrv - hrvRef < -35) {
         let noise = d3.deviation(prevThreeHRV);
-        hrv = (hrvRef == undefined ? 30 : hrvRef + (Math.random() * 2 * noise - noise));
+        hrv = (hrvRef == undefined ? 30 : hrvRef + (Math.random() * 2 * noise - noise)*3);
     } else {
         // In this case, the reference is computed based on the previous 3 normal values
         prevThreeHRV.push(hrv);
@@ -231,20 +257,16 @@ function deriveHr(signal){
         }
     }
 
-    return {"hrv": hrv,
-        "hr": hr,
-        "foundPeaks": foundPeaks,
-        "peakPlot":ppgSSFThreshd,
-        "threshPlot": ppgIrFilteredThrsd,
-        "outFiltered": outFiltered
+    return {"hrv": hrv, // INT of HRV computed by RMSSD in millisecond
+        "hr": hr, // INT of HR computed in BPMs
+        "foundPeaks": foundPeaks, // ARRAY with peaks of the PPG
+        "threshPlot": ppgIrFilteredThrsd, // ARRAY with square wave from thresholding PPG
+        "peakPlot": ppgSSFThreshd, // ARRAY with -1, 0, 1 from analysing the differences of the square wave
+        "outFiltered": outFiltered // ARRAY with filtered PPG
     }
 }
 
-/**
- *
- * @param dataHR
- * @returns {[]}
- */
+
 function smoothHR(dataHR){
     var smoothedHR = []
     //iterate unprocessed HR data array
@@ -259,42 +281,147 @@ function smoothHR(dataHR){
     return smoothedHR
 }
 
+// Computes the correspoding downslop for an upslope
+// Input: INT index of upslope to be analised, INT index of next upslopes and ARRAY w/ index of downslopes
+// Output: INT index of corresponding downslope
 function partner (int, intNext, array) {
 
     let element;
+
+    // If there is no upslope after the current one, it means the PPG window is ending
+    // In that case, assume the limit is the ending of the PPG window
     let end = (intNext == undefined ? intNext = 645 : intNext);
 
+    // Go through all downslopes
     for (var i=0; i < array.length; i++) {
+        // The index of downslope we are looking for must be higher than the upslope
+        // And should be lower than the follwing upslope
         if (array[i] > int && array[i] <= end) {
             element = array[i];
         }
     }
+
+    // Returns the index of the downslope correspoding to our upslope
     return element
 }
 
-module.exports = {
-    deriveHr : function(sig){return deriveHr(sig)},
-    smoothHR : function(hrArray){return smoothHR(hrArray)},
+function computeHRV (arrayPeaks) {
+
+    // Compute time difference between consecutive peaks
+    let anotherHR = [];
+    for(i=0; i<arrayPeaks.length-1; i++){
+        anotherHR.push(arrayPeaks[i+1]-arrayPeaks[i]);
+    }
+
+    // Compute the median value of the computed intervals
+    let standardInt = d3.median(anotherHR);
+
+    // Remove the intervals that are clearly outliers based on the median value
+    anotherHR = anotherHR.filter(item => 1.33*standardInt >= item && item >= 0.66*standardInt);
+
+    // Compute RMSSD
+    var anotherHRV = Math.sqrt(d3.mean(anotherHR.slice(1).map(function(element, idx) {return Math.pow((element - anotherHR[idx])*10, 2)})));
+
+    return anotherHRV
+
+}
+
+
+function computeHR (arrayPeaks) {
+
+    // Compute time difference between consecutive peaks
+    let anotherHR = [];
+    for(i=0; i<arrayPeaks.length-1; i++){
+        anotherHR.push(arrayPeaks[i+1]-arrayPeaks[i]);
+    }
+
+    // Compute the median value of the computed intervals
+    let standardInt = d3.median(anotherHR);
+
+    // Remove the intervals that are clearly outliers based on the median value
+    anotherHR = anotherHR.filter(item => 1.33*standardInt >= item && item >= 0.66*standardInt);
+
+    // Compute HR
+    anotherHR = d3.mean(anotherHR)*10 //hr in milliseconds
+    anotherHR = 60000/anotherHR; // hr in bpms
+
+    return anotherHR
+
+}
+
+// Computes an HRV value for the whole recording with the option for baseline
+// Inputs: INT of time for baseline in seconds (0 if there is no baseline)
+//         INT of time for size of windows to compute HRV values in seconds (Golden standard is 300 seconds, 5 minutes)
+//         INT of time for the slide of windows to compute HRV values in seconds (slide is the opposite of overlap)
+//
+// Output: ARRAY with 2 entries - baseline HRV and task HRV (baseline HRV will be NaN if there is no baseline)
+function computeRecordingHRV (time, size, slide) {
+    // Array to save HRV of the different windows
+    let allHRVs = [];
+
+    // Checks if the inputs were defined
+    // If undefined, the HRV will be computed for the whole recording
+    let start = (typeof time  == 'undefined' ?  0  : time);
+    let windSlide = (typeof slide == 'undefined' ? 0 : slide);
+    let windSize = (typeof size == 'undefined' ? allallPeaks[allallPeaks.length-1]/100 + 1 : size);
+
+    let p=0;
+    let analysis = true;
+
+    // Goes through all different windows based on the values of windSize and windSlide
+    while (analysis) {
+
+        // Computes HRV taking into account the relevant peaks of the considered window
+        // The Windows start being computed after the value of start
+        // Example: start = 60s; windSlide = 30s; windSize = 60s
+        // The relevant windows will be (60 - 120)s, (90 - 150)s, (120 - 180)s, (150 - 210)s
+        let hrv = computeHRV(allallPeaks.filter(element =>  p*windSlide + windSize + start >= element/100 && element/100 >= p*windSlide + start));
+        // Saves the HRV value
+        allHRVs.push(hrv);
+
+        // If the upper limit of the window being considered is higher than the last peak that was detected
+        if (p*windSlide + windSize + start > allallPeaks[allallPeaks.length-1]/100) {
+            // Stop the analysis
+            analysis = false;
+        }
+        p++;
+    }
+
+    // Computes HRV for the baseline
+    let baseHRV = computeHRV(allallPeaks.filter(element => time >= element/100));
+
+    // The final HRV of the relevant part of the recording will be the mean of the windows
+    return [baseHRV, d3.mean(allHRVs)];
+}
+
+/*
     writeIt : function() {
 
         let recordName = new Date().toISOString();
         recordName = recordName.replace(/:|\./g,"_");
         let jsonData = '{"ppg": ' + JSON.stringify(ppgData) + ',"danyPeaks": ' + JSON.stringify(danyPeaks) + ',"joaquimPeaks": '
-            + JSON.stringify(joaquimPeaks) + ',"squares": ' + JSON.stringify(squary) + ',"devs": ' + JSON.stringify(devs) + ',"raw": ' + JSON.stringify(rawPPG)
-            + ',"refs": ' + JSON.stringify(refs) + ',"allPeaks": ' + JSON.stringify(allallPeaks) + '}';
-
+                            + JSON.stringify(joaquimPeaks) + ',"squares": ' + JSON.stringify(squary) + ',"devs": ' + JSON.stringify(devs) + ',"raw": ' + JSON.stringify(rawPPG)
+                            + ',"refs": ' + JSON.stringify(refs) + ',"allPeaks": ' + JSON.stringify(allallPeaks) + '}';
         console.log(jsonData);
         fs.writeFile(`${recordName}_ppgstuff.txt`, jsonData, function(err) {
             if (err) {
                 console.log(err);
             }
         });
-
     },
+*/
 
+module.exports = {
+    deriveHr : function(sig){return deriveHr(sig)},
+    smoothHR : function(hrArray){return smoothHR(hrArray)},
+    fullRecordingHRV : function (time, size, slide) {return computeRecordingHRV(time, size, slide)},
     resetIt : function() {
         w = 0;
         z = 0;
         firstWindow = true;
+        hrvRef = undefined;
+        prevThreeHRV = [];
+        reference = undefined;
+        prevFive = [];
     }
 }

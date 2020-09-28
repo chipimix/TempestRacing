@@ -267,8 +267,6 @@ function plotProgressChart(svg_id, dataset, sampleRate, name = "Chart", width, h
             .attr("dy", "0.71em")
             .attr("text-anchor", "end")
             .text("Magnitude");
-        console.log("[PROGRESS] xAxis height : "+height)
-        console.log(margin)
         g.append("g")
             .attr("class", "xAxis")
             .attr("transform", "translate(0," + height + ")")
@@ -531,6 +529,7 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
  * Plots list of found devices on the guideMenu Interface and updates the alert message accordingly.
  * @param devices
  */
+
 function renderFoundDevices(devices) {
     d3.select("#leftGuideMenuText").selectAll("p").remove();
     d3.select("#leftGuideMenuText").append("p").text("MASTR Found! Please select...");
@@ -692,7 +691,7 @@ function brushed() {
     // console.log("brushed!");
     // console.log("currentXScale " + currentXScale.domain() + " " + currentXScale.range());
     // console.log("xRAW_wide " + xRAW_wide.domain() + " " + xRAW_wide.range());
-// (2) iterate through visible charts:
+    // (2) iterate through visible charts:
     ["CHART1", "CHART2"].forEach(function (id) {
         var data = d3.select("#" + id).select(".dataLine").datum();
         var dataMax = d3.max(data);
@@ -800,7 +799,7 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
     xRAW_wide = d3.scaleLinear().domain([0, data.length - 1]).range([0, width]);
 
     brush = d3.brushX()
-        .extent([[0, 0], [width, height * 0.24]])
+        .extent([[0, 0], [window.innerWidth, height * 0.24]])
         // line below TLDR: if you want to pass a callback, you have to pass a function, not call a function :)
         .on("brush end", function () {
             brushed();
@@ -837,10 +836,11 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
             .attr("fill", "none")
             .attr("d", tinyLine(data));
 
+        console.log("scrollzoombar doesn't  exists; initial brush width ="+window.innerWidth);
         scrollZoomBar.append("g")
             .attr("class", "brush")
             .call(brush)
-            .call(brush.move, xRAW_wide.range());
+            .call(brush.move, window.innerWidth);
         if (d3.select("#scrollBarContainer").select(".axis").empty()) {
             console.log("scrollzoombar axis is empty")
             scrollZoomBar.append("g")
@@ -859,10 +859,10 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
         scrollZoomBar = d3.select("#scrollBarContainer").select("g");
         d3.select("#tinyLine" + svgName.slice(1))
             .attr("d", tinyLine(data));
+        console.log("scrollzoombar already exists; initial brush width ="+window.innerWidth);
         scrollZoomBar.select(".brush")
             .call(brush)
-            .call(brush.move, xRAW_wide.range());
-        console.log(xRAW_wide.domain() + " < dom    ran > " + xRAW_wide.range());
+            .call(brush.move, window.innerWidth);
         d3.select("#scrollBarContainer").select(".axis")
             .call(d3.axisBottom(xRAW_wide)
                 .ticks(9)
@@ -944,6 +944,7 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
 function plotProgressScrollZoomBar(svgName, data, metricName, line, lineColor, width, height,xxDomain) {
     var height = 133.84976;
     var width = 1215;
+    console.log("plotProgressScrollZoomBar! height= "+height+"  ,width= "+width);
     if (typeof xxDomain === "undefined") xxDomain=d3.extent(recordsProgress)
     // console.log("new zoom with scale = "  +xxDomain);
     xRAW_wide = d3.scaleLinear().domain(xxDomain).range([5, width-5]);
@@ -1185,7 +1186,6 @@ function svgDropDown(options, defaultMetric, container, color) {
     options.hoverTextColor = "lightgray";
     options.bgColor = "rgba(0,0,0,0.8)";
     options.width;
-    console.log(options.width)
 // let marginLeft=0.5*container.node().getBBox().width-options.y;
     const g = container.append("svg").attr("class", "dropdownSvg").attr("width", "calc("+options.width+" + 2px)").attr("height", "100%")
         .append("g")

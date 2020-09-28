@@ -702,7 +702,7 @@ function gameReport(){
         formData['focus'] = d3.mean(focus).toString();
         formData['sleepiness'] = d3.mean(sleepiness).toString();
         formData['heartRate'] =d3.mean(heartRate).toString();
-        formData['hrv'] =d3.mean(hrv).toString();
+        formData['hrv'] = ppg.fullRecordingHRV()[1].toString();
         // formData['hrv'] =d3.mean(hearRateVariability).toString();
     }
 
@@ -784,6 +784,7 @@ function gameReport(){
 let SWOnlyMetricHandler;
 function startSWRecording(withHW=false){
     cleanMatchData();
+    ppg.resetIt();
     viewMode = "Live";
     closeHelper();
 
@@ -954,12 +955,12 @@ function initialPlot() {
     d3.selectAll(".zoom")
         .attr("width","100%")
 
-    plotter.plotScrollZoomBar( "#CHART1", datum1, d3.select("#CHART1").select(".dataLine").attr("d"), "#00ffb0",width,height);
+    plotter.plotScrollZoomBar( "#CHART1", datum1, d3.select("#CHART1").select(".dataLine").attr("d"), "#00ffb0",1218.8,133.849756097561);
 
     d3.select("#mouseInteraction").on("mousemove",handleSessionReportMouseMove);
     // left click mouse re-loads video
     d3.selectAll("video").on("click",()=>{d3.select("#screen").node().load();d3.select("#camera").node().load();});
-    plotter.plotScrollZoomBar( "#CHART2", datum2, d3.select("#CHART2").select(".dataLine").attr("d"), "#d31359",width,height);
+    plotter.plotScrollZoomBar( "#CHART2", datum2, d3.select("#CHART2").select(".dataLine").attr("d"), "#d31359",1218.8,133.849756097561);
 
     //
     // //display buttons interface
@@ -1134,7 +1135,6 @@ function deleteRecord(){
 
 }
 function nanToNa(arg){
-    console.log(arg)
     if(isNaN(arg)) return "N/A";
     return  arg;
 }
