@@ -316,7 +316,7 @@ function plotRacerUI(racerLst){
             .attr("class","btn")
             .text(d)
             .on("click", () =>{
-                console.log("selected " +d)
+                console.log("selected " +d);
                 d3.select("#usrId").text(d);
                 username = d;
                 racerLst.forEach((r)=>{

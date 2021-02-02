@@ -26,14 +26,12 @@ function startMediaRecording(fName, screenGrab,videoWidth,videoHeight,videoFPS,c
      * DesktopCapturerSource objects, each DesktopCapturerSource represents a screen or
      * an individual window that can be captured.
      */
-    console.log("------------------------------------cries in spanish------------------------------------")
     desktopCapturer.getSources({types:[ 'window', "screen","Entire screen"]}, (error, sources) => {
         if (error) throw error
         // Iterate trough available sources:
         if(screenGrab) {
             for (let i = 0; i < sources.length; i++) {
                 // If current source is Screen 1
-                console.log("--------------->" + sources[i].name);
                 if (sources[i].name === 'Entire screen' || sources[i].name == "Screen 1") {
                     // Request MediaStream Promise:
                     navigator.mediaDevices.getUserMedia({
@@ -136,7 +134,6 @@ function handleCameraStream(stream, fName){
     // console.log(cam);
     cam_recorder = new MediaRecorder(stream, {mimeType: 'video/webm;codecs=h264'});
     cam_recorder.ondataavailable = function(event){ // the entire media has been recorded
-        console.log('ondataavailable')
         var reader = new FileReader();
         reader.onload = function(){
             var buffer = Buffer.from(reader.result);
@@ -148,7 +145,7 @@ function handleCameraStream(stream, fName){
                         return
                     }
                     cam.srcObject = null;
-                    cam.src = URL.createObjectURL(event.data);
+                    cam.src = URL.createObjectURL(event.data);ap
                     cam.currentTime = 9999999999; // this line is important; other code is optional
                     cam.pause();
                 });

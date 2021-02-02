@@ -133,7 +133,7 @@
         request.post({url:'http://emotai.him3efvi97.eu-west-1.elasticbeanstalk.com/home/giefToken/', form: {username:document.getElementById("un").value, password:document.getElementById("pw").value}}, function(err,httpResponse,body){
             // console.log(err);
             let response = JSON.parse(body);
-            // console.log(response);
+            console.log(response);
             if(typeof response['non_field_errors'] !== 'undefined'){
                 console.log("username & password ain't working proper");
                 document.getElementById('pw').style.backgroundColor="darkgray";

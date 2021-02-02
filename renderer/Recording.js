@@ -163,7 +163,7 @@ window.addEventListener("load", () => {
 });
 window.addEventListener("resize", () =>{
     if(d3.select("#main").style("display")=="block"
-    && !d3.select("#CHART1").empty()){
+        && !d3.select("#CHART1").empty()){
         //replot properly
     }
 });
@@ -681,98 +681,98 @@ function gameReport(){
     let cameraVideoFile = workingDir+"\\readings\\"+recordName+"_cam.webm";
     setTimeout(()=>{
 
-    let formData = {
-        user: userId,
-        date: recordName.replace(/_/g, ":"),
-        apm: d3.mean(apm).toString(),
-        mouseMoves: d3.mean(mouseMoves).toString(),
-        fatigue: inputInteraction.getFinalFatigue(),
-        duration: duration,
-        derivedMetrics: fs.createReadStream(gameReportFile),
-        screenVideo: fs.createReadStream(screenVideoFile)
-    }
-    if (fs.existsSync(cameraVideoFile)) {
-        formData['camVideo'] = fs.createReadStream(cameraVideoFile);
-    }
-    if(engagement.length > 0){
-        formData['engagement'] = d3.mean(engagement).toString();
-        formData['stress'] = d3.mean(stress).toString();
-        formData['emotionalValence'] = d3.mean(emotionValence).toString();
-        formData['memoryLoad'] = d3.mean(memLoad).toString();
-        formData['focus'] = d3.mean(focus).toString();
-        formData['sleepiness'] = d3.mean(sleepiness).toString();
-        formData['heartRate'] =d3.mean(heartRate).toString();
-        formData['hrv'] = ppg.fullRecordingHRV()[1].toString();
-        // formData['hrv'] =d3.mean(hearRateVariability).toString();
-    }
-
-    let sentSize = 0;
-    let totalSize;
-    // after we get LoL game metrics, store game data in back-end
-    request.post(
-        {
-            url: "http://emotai.him3efvi97.eu-west-1.elasticbeanstalk.com/home/recordings/",
-            headers: {Authorization:"Token "+tok},
-            formData: formData
-        }, function(err, res, body) {
-            if (err || res.statusCode==404){
-                console.log(err)
-
-            } else{
-                console.log(body)
-                let bodyJson = JSON.parse(body);
-                recordId = bodyJson.id
-                parseProgressJSON([bodyJson])
-                //erase local files
-                let arr= [gameReportFile,screenVideoFile];
-                if(recordCamera){
-                    arr.push(cameraVideoFile)
-                }
-                arr.forEach((path)=>{
-                    fs.unlink(path, (err) => {
-                        if (err) {
-                            console.error(err)
-                            return
-                        }
-                        console.log("erased local files!")
-                    })
-                })
-                function updateRecap(timeStamp){
-                    console.log(timeStamp)
-                    date=recordsProgress[timeStamp].toLocaleString('en-GB',{weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour:'numeric'});
-
-                    let matchFatigue = progressData[timeStamp].fatigue*100;
-                    let matchApm = progressData[timeStamp].apm;
-
-                    document.getElementById("progressInspector").innerHTML = "<p style='    font-weight: bolder;text-align: center;font-size: x-large;margin: 1% 0%;'>GAME RECAP</p>"+
-                        "<p>"+date+"</p>"+
-                        "<p>Duration............ "+parseInt(duration)+" min</p>"+
-                        "<p>User................ "+username+"</p>"+
-                        "<p>Engagement.......... "+nanToNa(getGrade("engagement",timeStamp)) +" %</p>"+
-                        "<p>Emotional Valence... "+nanToNa(getGrade("emotionalValence",timeStamp)) +" %</p>"+
-                        "<p>Stress.............. "+nanToNa(getGrade("stress",timeStamp)) +" %</p>"+
-                        "<p>Sleepiness.......... "+nanToNa(getGrade("sleepiness",timeStamp)) +" %</p>"+
-                        "<p>Focus............... "+nanToNa(getGrade("focus",timeStamp)) +" %</p>"+
-                        "<p>Memory Load......... "+nanToNa(getGrade("focus",timeStamp)) +" %</p>"+
-                        "<p>Heart Rate.......... "+nanToNa(parseInt(progressData[timeStamp].heartRate)) +" bpm</p>"+
-                        "<p>HRV................. "+nanToNa(parseInt(progressData[timeStamp].hrv))+" ms</p>";
-
-                }
-                updateRecap(progressData.length-1)
-                console.log(date)
-                updateHeaderText(" 🏎️  "+date+"  Race Report  🏎️ ")
-                console.log("1UPLOAD COMPLETE!")
-
-
-            }
+        let formData = {
+            user: userId,
+            date: recordName.replace(/_/g, ":"),
+            apm: d3.mean(apm).toString(),
+            mouseMoves: d3.mean(mouseMoves).toString(),
+            fatigue: inputInteraction.getFinalFatigue(),
+            duration: duration,
+            derivedMetrics: fs.createReadStream(gameReportFile),
+            screenVideo: fs.createReadStream(screenVideoFile)
         }
-    ).on('data', function (chunk) {
-        sentSize+=chunk.length;
-        updateHeaderText(" ⌛  Uploading Race Report..."+parseInt(sentSize/totalSize*100)+"%  ⌛ ");
-        console.log(" ⌛  Uploading Race Report..."+parseInt(sentSize/totalSize*100)+"%  ⌛ ")
-    }).on( 'response', function ( data ) {
-        totalSize = data.headers['content-length'];
-    } );
+        if (fs.existsSync(cameraVideoFile)) {
+            formData['camVideo'] = fs.createReadStream(cameraVideoFile);
+        }
+        if(engagement.length > 0){
+            formData['engagement'] = d3.mean(engagement).toString();
+            formData['stress'] = d3.mean(stress).toString();
+            formData['emotionalValence'] = d3.mean(emotionValence).toString();
+            formData['memoryLoad'] = d3.mean(memLoad).toString();
+            formData['focus'] = d3.mean(focus).toString();
+            formData['sleepiness'] = d3.mean(sleepiness).toString();
+            formData['heartRate'] =d3.mean(heartRate).toString();
+            formData['hrv'] = ppg.fullRecordingHRV()[1].toString();
+            // formData['hrv'] =d3.mean(hearRateVariability).toString();
+        }
+
+        let sentSize = 0;
+        let totalSize;
+        // after we get LoL game metrics, store game data in back-end
+        request.post(
+            {
+                url: "http://emotai.him3efvi97.eu-west-1.elasticbeanstalk.com/home/recordings/",
+                headers: {Authorization:"Token "+tok},
+                formData: formData
+            }, function(err, res, body) {
+                if (err || res.statusCode==404){
+                    console.log(err)
+
+                } else{
+                    console.log(body)
+                    let bodyJson = JSON.parse(body);
+                    recordId = bodyJson.id
+                    parseProgressJSON([bodyJson])
+                    //erase local files
+                    let arr= [gameReportFile,screenVideoFile];
+                    if(recordCamera){
+                        arr.push(cameraVideoFile)
+                    }
+                    arr.forEach((path)=>{
+                        fs.unlink(path, (err) => {
+                            if (err) {
+                                console.error(err)
+                                return
+                            }
+                            console.log("erased local files!")
+                        })
+                    })
+                    function updateRecap(timeStamp){
+                        console.log(timeStamp)
+                        date=recordsProgress[timeStamp].toLocaleString('en-GB',{weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour:'numeric'});
+
+                        let matchFatigue = progressData[timeStamp].fatigue*100;
+                        let matchApm = progressData[timeStamp].apm;
+
+                        document.getElementById("progressInspector").innerHTML = "<p style='    font-weight: bolder;text-align: center;font-size: x-large;margin: 1% 0%;'>GAME RECAP</p>"+
+                            "<p>"+date+"</p>"+
+                            "<p>Duration............ "+parseInt(duration)+" min</p>"+
+                            "<p>User................ "+username+"</p>"+
+                            "<p>Engagement.......... "+nanToNa(getGrade("engagement",timeStamp)) +" %</p>"+
+                            "<p>Emotional Valence... "+nanToNa(getGrade("emotionalValence",timeStamp)) +" %</p>"+
+                            "<p>Stress.............. "+nanToNa(getGrade("stress",timeStamp)) +" %</p>"+
+                            "<p>Sleepiness.......... "+nanToNa(getGrade("sleepiness",timeStamp)) +" %</p>"+
+                            "<p>Focus............... "+nanToNa(getGrade("focus",timeStamp)) +" %</p>"+
+                            "<p>Memory Load......... "+nanToNa(getGrade("focus",timeStamp)) +" %</p>"+
+                            "<p>Heart Rate.......... "+nanToNa(parseInt(progressData[timeStamp].heartRate)) +" bpm</p>"+
+                            "<p>HRV................. "+nanToNa(parseInt(progressData[timeStamp].hrv))+" ms</p>";
+
+                    }
+                    updateRecap(progressData.length-1)
+                    console.log(date)
+                    updateHeaderText(" 🏎️  "+date+"  Race Report  🏎️ ")
+                    console.log("1UPLOAD COMPLETE!")
+
+
+                }
+            }
+        ).on('data', function (chunk) {
+            sentSize+=chunk.length;
+            updateHeaderText(" ⌛  Uploading Race Report..."+parseInt(sentSize/totalSize*100)+"%  ⌛ ");
+            console.log(" ⌛  Uploading Race Report..."+parseInt(sentSize/totalSize*100)+"%  ⌛ ")
+        }).on( 'response', function ( data ) {
+            totalSize = data.headers['content-length'];
+        } );
 
 
     }, 2000);
