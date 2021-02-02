@@ -145,7 +145,7 @@ function handleCameraStream(stream, fName){
                         return
                     }
                     cam.srcObject = null;
-                    cam.src = URL.createObjectURL(event.data);ap
+                    cam.src = URL.createObjectURL(event.data);
                     cam.currentTime = 9999999999; // this line is important; other code is optional
                     cam.pause();
                 });
