@@ -3,51 +3,207 @@ var brush, zoom;
 var xRAW_wide;
 var currentXScale;
 const em = new events.EventEmitter();
+let margin = {top: 20.16, right: 10, bottom: 21.599999999999998, left: 44};
 
-function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, height, xxDomain = [0, dataset.length - 1], yyDomain = [d3.max(dataset), d3.min(dataset)]) {
-    if (dataset == undefined || dataset.length < 2 || svg_id == "") return;
-    var color = "";
+function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, height, xxDomain = [0, dataset.length - 1], yyDomain = [d3.max(dataset), d3.min(dataset)], color ="#00ffb0") {
+    if (dataset == undefined || dataset.length < 2 || svg_id === "") return;
+
     //svg id needs to start with hashtag
-    if (svg_id[0] != "#") {
+    if (svg_id[0] !== "#") {
         svg_id = "#" + svg_id;
     }
     //if we're dealing with an horizontal line:
-    if (yyDomain[0] == yyDomain[1]) {
+    if (yyDomain[0] === yyDomain[1]) {
         yyDomain[1]++;
     }
     //get coloring according to chart 1 or 2
-    color = "#00ffb0"
-    if (svg_id == "#CHART2") {
-        color = "#d31359"
-    }
-
-
-// setup scales
+    // setup scales
     var xScale = d3.scaleLinear().domain(xxDomain).range([0, width]);
     var yScale = d3.scaleLinear().domain(yyDomain).range([0, height]);
+    // Setup line function
     var line = d3.line()
-        .x(function (d, i) {
-            return xScale(i);
-        })
-        .y(function (d, i) {
-            return yScale(d);
-        }).curve(d3.curveMonotoneX);
-    // dataset=dataset.slice(xxDomain[0],xxDomain[1])
-// setup y axis domain
-// let domain = [d3.max(dataset),d3.min(dataset)];
-// if(name == "Stress" || name=="Engagement" || name == "Sleepiness" || name == "Focus" || name == "Memory Load"){
-// let rescale = d3.scaleLinear().domain([d3.max(dataset),d3.min(dataset)]).range([100,0]);
+        .x(function (d, i) {return xScale(i);})
+        .y(function (d, i) {return yScale(d);})
+        .curve(d3.curveMonotoneX);
+
     let domain = [0, 100];
-// }else if(name=="Emotional Valence"){
-
-
-    if (name == "Emotional Valence") {
-        let rescale = d3.scaleLinear().domain([d3.max(dataset), d3.min(dataset)]).range([1, -1]);
-        //
-        domain = [-1, 1];
-    } else if (name == "Heart Rate" || name == "Creep Score" || name == "Gold" || name == "Actions Per Minute" || name == "HRV") {
-        domain = [d3.min(dataset), d3.max(dataset)];
+    let yUnits = "Magnitude";
+    switch(name) {
+        case "Heart Rate":
+            yUnits = "BPM";
+            break;
+        case "HRV":
+            yUnits = "Milliseconds";
+            break;
+        case "Creep Score":
+            yUnits = "CSM"
+            break;
+        case "Gold":
+            yUnits = ""
+            break;
+        case "Actions Per Minute":
+            yUnits = "APM"
+            break;
     }
+    if(color === 'gradient'){
+        console.log("plot with gradient")
+        if (name === "Emotional Valence") {
+            console.log("metric = emo val")
+            domain = [-1, 1];
+            d3.select(svg_id).append("linearGradient")
+                .attr("id", "yesThisIsEmoValGradient")
+                .attr("gradientUnits", "userSpaceOnUse")
+                .attr("x1", 0).attr("y1", 0)
+                .attr("x2", 0).attr("y2", 120)
+                .selectAll("stop")
+                .data([
+                    {offset: "0%", color: "#00FFB0"},
+                    {offset: "40%", color: "#00FFB0"},
+                    {offset: "60%", color: "#FF0051"},
+                    {offset: "100%", color: "#FF0051"}
+                ])
+                .enter().append("stop")
+                .attr("offset", function(d) { return d.offset; })
+                .attr("stop-color", function(d) { return d.color; });
+            color = 'url(#yesThisIsEmoValGradient)'
+        } else if (name === "Heart Rate" || name === "Creep Score" || name === "Gold" || name === "Actions Per Minute" || name === "HRV") {
+            domain = [d3.min(dataset), d3.max(dataset)];
+            if(name === "Heart Rate"){
+                console.log("metric = hr")
+
+                d3.select(svg_id).append("linearGradient")
+                    .attr("id", "yesThisIsHRGradient")
+                    .attr("gradientUnits", "userSpaceOnUse")
+                    .attr("x1", 0).attr("y1", 0)
+                    .attr("x2", 0).attr("y2", 120)
+                    .selectAll("stop")
+                    .data([
+                        {offset: "0%", color: "#FF0051"},
+                        // {offset: "33%", color: "#FF0051"},
+                        // {offset: "33%", color: "#FFAE00"},
+                        // {offset: "66%", color: "#FFAE00"},
+                        {offset: "50%", color: "#FFAE00"},
+                        // {offset: "66%", color: "#00FFB0"},
+                        {offset: "100%", color: "#00FFB0"}
+                    ])
+                    .enter().append("stop")
+                    .attr("offset", function(d) { return d.offset; })
+                    .attr("stop-color", function(d) { return d.color; });
+                color = 'url(#yesThisIsHRGradient)'
+                yUnits = "Beats per minute"
+            }else if(name === 'HRV'){
+                console.log("metric = hrv")
+
+                d3.select(svg_id).append("linearGradient")
+                    .attr("id", "yesThisIsHRVGradient")
+                    .attr("gradientUnits", "userSpaceOnUse")
+                    .attr("x1", 0).attr("y1", 0)
+                    .attr("x2", 0).attr("y2", 120)
+                    .selectAll("stop")
+                    .data([
+                        {offset: "0%", color: "#00FFB0"},
+                        // {offset: "33%", color: "#00FFB0"},
+                        // {offset: "33%", color: "#FFAE00"},
+                        {offset: "50%", color: "#FFAE00"},
+                        // {offset: "66%", color: "#FFAE00"},
+                        // {offset: "66%", color: "#FF0051"},
+                        {offset: "100%", color: "#FF0051"}
+                    ])
+                    .enter().append("stop")
+                    .attr("offset", function(d) { return d.offset; })
+                    .attr("stop-color", function(d) { return d.color; });
+                color = 'url(#yesThisIsHRVGradient)'
+                yUnits = "Milliseconds"
+            }
+        }else if(name === "Stress"){
+            console.log("metric = stress")
+
+            d3.select(svg_id).append("linearGradient")
+                .attr("id", "yesThisIsStressGradient")
+                .attr("gradientUnits", "userSpaceOnUse")
+                .attr("x1", 0).attr("y1", 0)
+                .attr("x2", 0).attr("y2", 120)
+                .selectAll("stop")
+                .data([
+                    {offset: "0%", color: "#FF0029"},
+                    // {offset: "33%", color: "#FF0029"},
+                    // {offset: "33%", color: "#DB006A"},
+                    {offset: "50%", color: "#DB006A"},
+                    // {offset: "66%", color: "#DB006A"},
+                    // {offset: "66%", color: "#B60083"},
+                    {offset: "100%", color: "#B60083"}
+                ])
+                .enter().append("stop")
+                .attr("offset", function(d) { return d.offset; })
+                .attr("stop-color", function(d) { return d.color; });
+            color = 'url(#yesThisIsStressGradient)'
+        }else if(name === "MemLoad"){
+            console.log("metric = mem load")
+
+            d3.select(svg_id).append("linearGradient")
+                .attr("id", "yesThisIsMemLoadGradient")
+                .attr("gradientUnits", "userSpaceOnUse")
+                .attr("x1", 0).attr("y1", 0)
+                .attr("x2", 0).attr("y2", 120)
+                .selectAll("stop")
+                .data([
+                    {offset: "0%", color: "#0029FF"},
+                    // {offset: "33%", color: "#0029FF"},
+                    // {offset: "33%", color: "#2445DB"},
+                    // {offset: "66%", color: "#2445DB"},
+                    {offset: "50%", color: "#2445DB"},
+                    // {offset: "66%", color: "#493AB6"},
+                    {offset: "100%", color: "#493AB6"}
+                ])
+                .enter().append("stop")
+                .attr("offset", function(d) { return d.offset; })
+                .attr("stop-color", function(d) { return d.color; });
+            color = 'url(#yesThisIsMemLoadGradient)'
+        }else if(name === "Sleepiness"){
+            console.log("metric = sleepiness")
+
+            d3.select(svg_id).append("linearGradient")
+                .attr("id", "yesThisIsSleepGradient")
+                .attr("gradientUnits", "userSpaceOnUse")
+                .attr("x1", 0).attr("y1", 0)
+                .attr("x2", 0).attr("y2", 120)
+                .selectAll("stop")
+                .data([
+                    {offset: "0%", color: "#FFAE00"},
+                    // {offset: "33%", color: "#FFAE00"},
+                    // {offset: "33%", color: "#DB9524"},
+                    {offset: "50%", color: "#DB9524"},
+                    // {offset: "66%", color: "#DB9524"},
+                    // {offset: "66%", color: "#B67C49"},
+                    {offset: "100%", color: "#B67C49"}
+                ])
+                .enter().append("stop")
+                .attr("offset", function(d) { return d.offset; })
+                .attr("stop-color", function(d) { return d.color; });
+            color = 'url(#yesThisIsSleepGradient)';
+        }else if(name === "Engagement"){
+            d3.select(svg_id).append("linearGradient")
+                .attr("id", "yesThisIsEngagementGradient")
+                .attr("gradientUnits", "userSpaceOnUse")
+                .attr("x1", 0).attr("y1", 0)
+                .attr("x2", 0).attr("y2", 120)
+                .selectAll("stop")
+                .data([
+                    {offset: "0%", color: "#00FFB0"},
+                    // {offset: "33%", color: "#00FFB0"},
+                    // {offset: "33%", color: "#00DBBB"},
+                    // {offset: "66%", color: "#00DBBB"},
+                    {offset: "50%", color: "#00DBBB"},
+                    // {offset: "66%", color: "#00B6C7"},
+                    {offset: "100%", color: "#00B6C7"}
+                ])
+                .enter().append("stop")
+                .attr("offset", function(d) { return d.offset; })
+                .attr("stop-color", function(d) { return d.color; });
+            color = 'url(#yesThisIsEngagementGradient)';
+        }
+    }
+
     if (d3.select(svg_id).select("g").empty()) { //if there was no linechart plotted beforehand
         //create g with transform for axis labels and title
         var svg = d3.select(svg_id).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").style("color", color);
@@ -55,11 +211,10 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
         svg.append("defs").append("clipPath")
             .attr("id", "clip" + svg_id.slice(1))
             .append("rect")
-            .attr("height", "95%")
+            .attr("height", "24vh")
             .attr("width", "95.22%")
         // append x axis:
-        console.log("[SESSIONS] xAxis height : "+height)
-        console.log(margin)
+
         svg.append("g")
             .attr("class", "xAxis")
             .attr("transform", "translate(0," + height + ")")
@@ -73,12 +228,14 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
             .call(d3.axisLeft(d3.scaleLinear().domain(domain).range([height, 0])))
             .append("text")
             .attr("fill", color)
-            .attr("y", "-1.5em")
-            .attr("dy", "0.71em")
-            .attr("text-anchor", "end")
-            .text("Magnitude");
+            .attr("y", "-1em")
+            .attr("x", "-2.7em")
+            .attr("text-anchor", "start")
+            .text(yUnits);
         // append svg path element describing our line:
-        svg.append("g").attr("clip-path", "url(#clip" + svg_id.slice(1) + ")").append("path")
+        svg.append("g")
+            .attr("clip-path", "url(#clip" + svg_id.slice(1) + ")")
+            .append("path")
             .attr("class", "dataLine")
             .datum(dataset)
             .attr("fill", "none")
@@ -98,9 +255,8 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
                     return d3.timeFormat('%M:%S')(new Date(0).setSeconds(d))
                 }));
         //update y axis
-        console.log("plotLineChart update yAxis domain = "+domain)
         d3.select(svg_id).select(".yAxis")
-            .call(d3.axisLeft(d3.scaleLinear().domain(domain).range([height, 0])))
+            .call(d3.axisLeft(d3.scaleLinear().domain(domain).range([height, 0])));
         //erased lines below as we should only need to do this once
         // d3.select("#clip"+svg_id.slice(1))
         //     .select("rect")
@@ -109,6 +265,114 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
         // .call(d3.axisBottom(xScale)/* .tickFormat((d)=>{return (d/sampleRate).toFixed(1);})*/);
 
     }
+}
+
+function plotRtLineChart(svg_id, dataset, sampleRate, xxDomainStart = 0, xxDomainEnd = dataset.length, yyDomainStart = d3.min(dataset), yyDomainEnd = d3.max(dataset)) {
+    if (dataset == undefined || svg_id == "") return;
+    if (dataset[0].length == 2) {
+        var auxDataset = [];
+        dataset.forEach((el) => {
+            auxDataset.push(el[1])
+        });
+        dataset = auxDataset;
+        xxDomainEnd = dataset.length;
+        yyDomainStart = d3.min(dataset);
+        yyDomainEnd = d3.max(dataset);
+    }
+    if (svg_id[0] != "#") {
+        svg_id = "#" + svg_id;
+    }
+    if (yyDomainStart == yyDomainEnd) {
+        yyDomainEnd++;
+    }
+    var width = d3.select(svg_id).node().clientWidth - margin.left - margin.right;
+    var height = d3.select(svg_id).node().clientHeight - margin.top - margin.bottom;
+
+// setup scales
+    var xScale = d3.scaleLinear().domain([xxDomainStart, xxDomainEnd]).range([0, width]);
+    var yScale = d3.scaleLinear().domain([yyDomainEnd, yyDomainStart]).range([0, height]);
+    if (svg_id == "#EEG4" || svg_id == "#EEG3") {
+        yScale = d3.scaleLog().domain([yyDomainEnd, yyDomainStart]).range([0, height]);
+    }
+// define line function (returns svg path)
+// var line = d3.line()
+//                .x(function (d, i) { return xScale(i);})
+//                .y(function (d, i) { return yScale(d);});
+
+    if (d3.select(svg_id).select("g").empty()) {
+        //create
+        var svg = d3.select(svg_id).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").style("color", "#00ffb0");
+        svg.append("defs").append("clipPath")
+            .attr("id", "clip" + svg_id.slice(1))
+            .append("rect")
+            .attr("height", "24vh")
+            .attr("width", "95.22%")
+        // append x axis:
+        svg.append("g")
+            .attr("class", "xAxis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(xScale).tickFormat((d) => {
+                return (d / sampleRate).toFixed(1);
+            }))
+            .append("text")
+            .text("Seconds");
+        // append y axis:
+        svg.append("g")
+            .attr("class", "yAxis")
+            .call(d3.axisLeft(yScale))
+            .append("text")
+            .attr("fill", "#00ffb0")
+            .attr("y", "-1em")
+            .attr("x", "-2.7em")
+            .attr("text-anchor", "start")
+            .text("Magnitude");
+        // append svg path element describing our line:
+        svg.append("g")
+            .attr("clip-path", "url(#clip" + svg_id.slice(1) + ")").append("path")
+            .attr("class", "dataLine")
+            .datum(dataset)
+            .attr("fill", "#00ffb0")
+            .attr("fill-opacity", 0.1)
+            .attr("stroke", "#00ffb0")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 1.5)
+            .attr("d", line);
+        // 12. Appends a circle for each datapoint
+        // svg.selectAll(".dot")
+        //     .data(dataset)
+        //     .enter().append("circle") // Uses the enter().append() method
+        //     .attr("class", "dot") // Assign a class for styling
+        //     .attr("cx", function(d, i) { return xScale(i) })
+        //     .attr("cy", function(d) { return yScale(d.y) })
+        //     .attr("r", 5);
+    } else {
+        //update
+        if (dataset.length < sampleRate * 6) {
+            d3.select(svg_id).select(".dataLine").datum(dataset).attr("d", line);
+            d3.select(svg_id).select(".xAxis")
+                .call(d3.axisBottom(xScale)/* .tickFormat((d)=>{return (d/sampleRate).toFixed(1);})*/);
+            d3.select(svg_id).select(".yAxis")
+                .call(d3.axisLeft(yScale));
+        } else {
+            var xScale = d3.scaleLinear().domain([xxDomainStart, xxDomainEnd - sampleRate]).range([0, width]);
+            var line = d3.line()
+                .x(function (d, i) {
+                    return xScale(i);
+                })
+                .y(function (d, i) {
+                    return yScale(d);
+                });
+            d3.select(svg_id).select(".dataLine").datum(dataset).attr("d", line);
+            d3.select(svg_id).select(".yAxis").call(d3.axisLeft(yScale))
+            d3.select(svg_id).select(".xAxis").call(d3.axisBottom(xScale))
+            d3.select(svg_id).select(".dataLine").attr("transform", null)
+                .transition().duration(800)
+                .attr("transform", "translate(" + xScale(-sampleRate) + ")");
+        }
+
+    }
+
 }
 
 function plotRtLineChart(svg_id, dataset, sampleRate, xxDomainStart = 0, xxDomainEnd = dataset.length, yyDomainStart = d3.min(dataset), yyDomainEnd = d3.max(dataset)) {
@@ -1502,8 +1766,8 @@ module.exports = {
     cleanPlots: function () {
         cleanPlots();
     },
-    plotLineChart: function (svgId, svgDatum, sr, name, width, height, xDomain, yDomain) {
-        plotLineChart(svgId, svgDatum, sr, name, width, height, xDomain, yDomain)
+    plotLineChart: function (svgId, svgDatum, sr, name, width, height, xDomain, yDomain, color) {
+        plotLineChart(svgId, svgDatum, sr, name, width, height, xDomain, yDomain, color)
     },
     plotRtLineChart: function (svgId, svgDatum, sr, xmin, xmax, ymin, ymax) {
         plotRtLineChart(svgId, svgDatum, sr, xmin, xmax, ymin, ymax)

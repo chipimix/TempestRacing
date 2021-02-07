@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="export.css">
+    <title>Export Report Preview Window</title>
+</head>
+<img src="../images/export.png" id="export_icon" style="opacity:0;position:fixed;left:22%;top:25%;">
+<body title="Left Click to print BioPerformance Report!" onclick="handleClick()" onmouseover="handleMouseOver()" onmouseout="handleMouseOut()" style="margin:0;  -webkit-print-color-adjust: exact !important;cursor:pointer;overflow-x: hidden">
+<img src="../images/report_emotai.png" style="position: absolute;top:2%;left: 3%;width: 21%;">
+<div id="summary" style="
+    padding-top: 20px;
+    padding-bottom: 20px;
+">
+
+    <p style="
+    text-align: center;
+    font-size: xx-large;
+    margin: 1em 0;
+">BioPerformance Report</p>
+    <div style="width: 39%;float: left;    border-right: 1px solid black;">
+        <div style="width: 50%;text-align: right;float: left;">Racer: <br>Date: <br>Time: <br>Duration:&nbsp;</div>
+        <div id="summary_col1" style="float: left;text-align: left;"><p>chipimix</p><p>Wed, 11 Nov 2020</p><p>14:46</p><p>00:02:29</p></div>
+    </div>
+    <div style="width: 22%;float: left;    border-right: 1px solid black;">
+        <div style="width: 62%;text-align: right;float: left;">Heart Rate: <br>HRV: <br>Stress:&nbsp;<br></div>
+        <div id="summary_col2" style="text-align: left;float: left;"><p>69 bpm</p><p>46 ms</p><p>49 %</p><p>&nbsp;</p></div>
+    </div>
+    <div style="float: left;width: 38%;">
+        <div style="width: 57%;text-align: right;float: left;">Emotional Valence: <br>Engagement: <br>Sleepiness: <br>MemoryLoad:&nbsp;</div>
+        <div id="summary_col3" style="float: left;text-align: left;"><p>38 %</p><p>44 %</p><p>62 %</p><p>57 %</p></div>
+    </div>
+    <!--    <div style="column-count:3;column-rule: 1px solid #00ffb0;padding-top: 20px;"> The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.-->
+</div>
+<div class="chartTitle" style="padding-top: 90px;">Heart Rate</div>
+<svg id="CHART1" class="lineChart" > </svg>
+<div class="chartTitle">Heart Rate Variability</div>
+<svg id="CHART2" class="lineChart" ></svg>
+<div class="chartTitle">Stress</div>
+<svg id="CHART3" class="lineChart" ></svg>
+<div class="chartTitle">Emotional Valence</div>
+<svg id="CHART4" class="lineChart" ></svg>
+<p style="text-align: right;">© 2020 EMOTAI - Boosting Human Performance.</p>
+<div class="chartTitle">Engagement</div>
+<svg id="CHART5" class="lineChart" ></svg>
+<div class="chartTitle">Sleepiness</div>
+<svg id="CHART6" class="lineChart" ></svg>
+<div class="chartTitle">Memory Load</div>
+<svg id="CHART7" class="lineChart" ></svg>
+
+</body>
+<script>
+    const plotter = require('../scripts/svg-renderer');
+    var ipcRenderer = require('electron').ipcRenderer;
+    var d3 = require('d3');
+    let dd = [];
+    ipcRenderer.on('reportData', function (event,datum) {
+        plotter.plotLineChart('CHART1', datum.hr, 1, 'Heart Rate', 650, 120, undefined, undefined, 'gradient');
+        plotter.plotLineChart('CHART2', datum.hrv, 1, 'HRV', 650, 120, undefined, undefined, 'gradient');
+        plotter.plotLineChart('CHART3', datum.stress, 1, 'Stress', 650, 120, undefined, undefined, 'gradient');
+        plotter.plotLineChart('CHART4', datum.emoVal, 1, 'Emotional Valence', 650, 120,undefined,undefined, 'gradient');
+        plotter.plotLineChart('CHART5', datum.engagement, 1, 'Engagement', 650, 120, undefined, undefined, 'gradient');
+        plotter.plotLineChart('CHART6', datum.sleepiness, 1, 'Sleepiness', 650, 120, undefined, undefined, 'gradient');
+        plotter.plotLineChart('CHART7', datum.memLoad, 1, 'MemLoad', 650, 120, undefined, undefined, 'gradient');
+       dd = datum.meta['date']
+
+       console.log((~~(datum.meta['duration'] / (60*60)) + "").padStart(2, '0') + ":" + (~~(datum.meta['duration'] / 60) + "").padStart(2, '0') + ":" + (~~((datum.meta['duration'] / 60) % 1 * 60) + "").padStart(2, '0')+"");
+
+
+        d3.select("#summary_col1").selectAll('p').nodes()[0].textContent = String(datum.meta['user']);
+        d3.select("#summary_col1").selectAll('p').nodes()[1].textContent = new Date(datum.meta['date']).toLocaleString('en-GB',{timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone, weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'});
+        d3.select("#summary_col1").selectAll('p').nodes()[2].textContent = new Date(datum.meta['date']).toLocaleString('en-GB',{timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone, hour:'numeric', minute:'numeric'});
+        d3.select("#summary_col1").selectAll('p').nodes()[3].textContent = (~~(datum.meta['duration'] / (60*60)) + "").padStart(2, '0') + ":" + (~~(datum.meta['duration'] / 60) + "").padStart(2, '0') + ":" + (~~((datum.meta['duration'] / 60) % 1 * 60) + "").padStart(2, '0');
+        d3.select("#summary_col2").selectAll('p').nodes()[0].textContent = String(parseInt(datum.meta['hr']))+" bpm";
+        d3.select("#summary_col2").selectAll('p').nodes()[1].textContent = String(parseInt(datum.meta['hrv']))+" ms";
+        d3.select("#summary_col2").selectAll('p').nodes()[2].textContent = String(parseInt(datum.meta['stress']))+" %";
+        d3.select("#summary_col3").selectAll('p').nodes()[0].textContent = String(parseInt( datum.meta['valence']))+" %";
+        d3.select("#summary_col3").selectAll('p').nodes()[1].textContent = String(parseInt(datum.meta['engagement']))+" %";
+        d3.select("#summary_col3").selectAll('p').nodes()[2].textContent = String(parseInt( datum.meta['sleepiness']))+" %";
+        d3.select("#summary_col3").selectAll('p').nodes()[3].textContent = String(parseInt( datum.meta['memLoad']))+" %";
+    });
+    function handleClick(){
+        d3.select("body").style("opacity",1);
+        d3.select("#export_icon").style("opacity",0);
+        ipcRenderer.send('print')
+    }
+    function handleMouseOver(){
+        d3.select("body").style("opacity",0.8);
+        d3.select("#export_icon").style("opacity",0.1);
+    }
+    function handleMouseOut(){
+        d3.select("body").style("opacity",1);
+        d3.select("#export_icon").style("opacity",0);
+    }
+
+</script>
+</html>

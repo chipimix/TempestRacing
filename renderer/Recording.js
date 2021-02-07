@@ -92,6 +92,9 @@ var fileEmitter = plotter.emitter();
 let width = 1218.8;
 let height = 133.849756097561;
 
+let matchMetadata = {};
+let reportMetadata = {};
+
 var tok="";
 var userId=0;
 var racerList=[];
@@ -1146,3 +1149,9 @@ function handleProgressMouseInteraction(){
     d3.select("#mouseInteraction").on("click",handleProgressHistoryMouseClick)
 }
 function getFocus(){return focus;}
+function launchExportReportWindow(){
+    ipcRenderer.send('exportReport', {"hr":heartRate,"hrv":hrv,"emoVal":emotionValence ,"engagement":engagement ,"stress": stress, "sleepiness":sleepiness,"memLoad":memLoad,"metadata":matchMetadata,
+        meta:{hr:d3.mean(heartRate),hrv:d3.mean(hrv),engagement:d3.scaleLinear().domain([d3.min(engagement),d3.max(engagement)]).range([0,100])(d3.mean(engagement)),valence:d3.scaleLinear().domain([d3.min(emotionValence),d3.max(emotionValence)]).range([0,100])(d3.mean(emotionValence)),
+            stress:d3.scaleLinear().domain([d3.min(stress),d3.max(stress)]).range([0,100])(d3.mean(stress)),"sleepiness":d3.scaleLinear().domain([d3.min(sleepiness),d3.max(sleepiness)]).range([0,100])(d3.mean(sleepiness)),
+            "memLoad":d3.scaleLinear().domain([d3.min(memLoad),d3.max(memLoad)]).range([0,100])(d3.mean(memLoad)),"user":username,"duration":engagement.length,"date":recordName.replace(/_/g,":")}})
+}

@@ -1,0 +1,32 @@
+
+#summary{
+    width:100vw;
+    padding-bottom: 30px;
+}
+.lineChart{
+    height:156px;
+    width:100vw;
+
+}
+.chartTitle{
+    padding-top: 2px;
+    padding-bottom: 4px;
+}
+svg{
+    margin-bottom:5px;
+    background-color: #FAFAFA;
+}
+@font-face {
+    font-family: 'OpenSans-Bold';
+    font-weight: bold;
+    src:
+            local('OpenSans-Bold'),
+            url(../fonts/OpenSans-Bold.ttf) format('truetype');
+}
+div{
+    font-family: OpenSans-Bold;
+    text-align: center;
+}
+p{
+    margin:0;
+}

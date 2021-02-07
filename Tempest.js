@@ -83,8 +83,56 @@ function createLoginWindow(){
         createMenuWindow(arg)
         loginWindow.close()
     });
+    ipcMain.on('exportReport', (e,arg) => {
+        createExportReportWindow(arg)
+        // loginWindow.close()
+    });
 }
 
+function createExportReportWindow(arg){
+    let exportWindow = new Window({
+        file: 'renderer/ExportReport.html',
+        width:764,
+        height:1080,
+        // alwaysOnTop: true,
+        resizable:false,
+        backgroundColor: '#fff',
+        frame: true,
+        webPreferences: { enableRemoteModule: true }
+    }   );
+    exportWindow.setMenuBarVisibility(false)
+    exportWindow.once('ready-to-show', () => {
+        exportWindow.show()
+        console.log(arg)
+        exportWindow.webContents.send('reportData', arg);
+
+    });
+
+    ipcMain.on('print',()=>{
+        // const electron = require('electron');
+        // const BrowserWindow = electron.remote.BrowserWindow;
+        // var filepath = 'C:\\Users\\danielRocha\\Desktop\\print1.pdf';
+        var options = {
+            marginsType: 0,
+            pageSize: 'A4',
+            printBackground: true,
+            printSelectionOnly: false,
+            landscape: false
+        }
+        // let win = BrowserWindow.getFocusedWindow();
+        // electron.remote.getCurrentWebContents().print();
+        exportWindow.webContents.print();
+        // exportWindow.webContents.printToPDF({}).then(data => {
+        //     fs.writeFile('C:\\Users\\danielRocha\\Desktop\\readings', data, (error) => {
+        //         if (error) throw error
+        //         console.log(`Wrote PDF successfully`)
+        //     })
+        // }).catch(error => {
+        //     console.log(`Failed to write PDF `)
+        // })
+    })
+
+}
 app.on('ready', createSplashWindow)
 
 app.on('window-all-closed', function(){
