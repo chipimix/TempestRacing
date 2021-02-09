@@ -25,7 +25,13 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
         .x(function (d, i) {return xScale(i);})
         .y(function (d, i) {return yScale(d);})
         .curve(d3.curveMonotoneX);
-
+    let record_dur = dataset.length;
+    let formatTime = d3.timeFormat("%M:%S");
+    if (record_dur < 60) {
+        formatTime = d3.timeFormat("%S");
+    }else if(record_dur >3600){
+        formatTime = d3.timeFormat("%H:%M:%S");
+    }
     let domain = [0, 100];
     let yUnits = "Magnitude";
     switch(name) {
@@ -220,7 +226,7 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(xScale).ticks(9)
                 .tickFormat(function (d) {
-                    return d3.timeFormat('%M:%S')(new Date(0).setSeconds(d))
+                    return formatTime(new Date(0).setSeconds(d))
                 }));
         //append y axis
         svg.append("g")
@@ -252,7 +258,8 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(xScale).ticks(9)
                 .tickFormat(function (d) {
-                    return d3.timeFormat('%M:%S')(new Date(0).setSeconds(d))
+
+                    return formatTime(new Date(0).setSeconds(d))
                 }));
         //update y axis
         d3.select(svg_id).select(".yAxis")
@@ -534,7 +541,7 @@ function plotProgressChart(svg_id, dataset, sampleRate, name = "Chart", width, h
         g.append("g")
             .attr("class", "xAxis")
             .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%d %b - %I:%M")).ticks(7))
+            .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%d %b - %H:%M")).ticks(7))
         // append svg path element describing our line:
         let clipG = g.append("g").attr("clip-path", "url(#clip" + svg_id.slice(1) + ")");
         clipG.append("path")
@@ -568,7 +575,7 @@ function plotProgressChart(svg_id, dataset, sampleRate, name = "Chart", width, h
         var g = d3.select(svg_id).select("g");
         g.select(".dataLine").datum(dataset).attr("d", line);
         g.select(".xAxis")
-            .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%d %b - %I:%M")).ticks(7))
+            .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%d %b - %H:%M")).ticks(7))
         g.selectAll(".yAxis")
             .call(d3.axisLeft(d3.scaleLinear().domain(domain).range([height, 0])));
         g.selectAll(".dot").data(dataset)
@@ -683,7 +690,9 @@ function plotPpgLiveAnimation(svg_id, dataset, sampleRate, hr, xxDomainStart = 0
             d3.select(svg_id).select(".dataLine").attr("transform", null)
                 .transition().duration(900)
                 .attr("transform", "translate(" + xScale(-sampleRate) + ")");
-            d3.select("#bpm_text").text(parseInt(hr)+" bpm");
+            if(Number.isInteger(parseInt(hr))){
+                d3.select("#bpm_text").text(parseInt(hr)+" bpm");
+            }
         }
 
     }
@@ -848,14 +857,9 @@ function zoomed() {
     if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush")
         return; // ignore zoom-by-brush
     var t = d3.event.transform;
-
-    console.log("zoomed!");
-    console.log("currentXScale " + currentXScale.domain() + " " + currentXScale.range());
-    console.log("xRAW_wide " + xRAW_wide.domain() + " " + xRAW_wide.range());
+    let record_dur = 0;
     ["CHART1", "CHART2"].forEach(function (id) {
-        //
-        // var height = d3.select("#" + id).select(".yAxis").select(".domain").node().getBBox().height;
-        // var width = d3.select("#" + id).select(".xAxis").select(".domain").node().getBBox().width;
+
         var height = 133.84976;
         var width = 1215;
         var data = d3.select("#" + id).select(".dataLine").datum();
@@ -863,9 +867,8 @@ function zoomed() {
         var dataMin = d3.min(data);
         var line = getPath(width, height, data);
         var scaleB4 = d3.scaleLinear().domain(currentXScale.domain()).range(currentXScale.range());
-
         var newXDomain = t.rescaleX(xRAW_wide).domain();
-
+        record_dur = data.length;
         currentXScale.domain(newXDomain);
         data = data.slice(currentXScale.domain()[0], currentXScale.domain()[1]);
 
@@ -911,13 +914,19 @@ function zoomed() {
     d3.selectAll(".brush").call(brush.move, xRAW_wide.range().map(t.invertX, t));
 
 // update all x axis, regardless of visible charts
+    let formatTime = d3.timeFormat("%M:%S");
+    if (record_dur < 60) {
+        formatTime = d3.timeFormat("%S");
+    }else if(record_dur >3600){
+        formatTime = d3.timeFormat("%H:%M:%S");
+    }
     d3.selectAll(".xAxis")
         .call(d3.axisBottom(currentXScale)
         // .ticks(d3.min(Math.ceil(currentXScale.domain()[1]-currentXScale.domain()[0]),10))
         // .ticks(10)
             .ticks(9)
             .tickFormat(function (d) {
-                return d3.timeFormat('%M:%S')(new Date(0).setSeconds(d))
+                return formatTime(new Date(0).setSeconds(d))
             }));
 
     if(d3.selectAll("#progressInspector p").nodes().length > 0){
@@ -951,7 +960,7 @@ function brushed() {
     if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom")
         return; // ignore brush-by-zoom
     var s = d3.event.selection || xRAW_wide.range();
-
+    let record_dur = 0;
     // console.log("brushed!");
     // console.log("currentXScale " + currentXScale.domain() + " " + currentXScale.range());
     // console.log("xRAW_wide " + xRAW_wide.domain() + " " + xRAW_wide.range());
@@ -966,7 +975,7 @@ function brushed() {
         var line = getPath(width, height, data);
         var scaleB4 = d3.scaleLinear().domain(currentXScale.domain()).range(currentXScale.range());
         xRAW_wide.domain(s.map(xRAW_wide.invert, xRAW_wide));
-
+        record_dur = data.length;
         data = data.slice(xRAW_wide.domain()[0], xRAW_wide.domain()[1]);
         line.x(function (d, i) {
             return xRAW_wide(i)
@@ -1016,14 +1025,19 @@ function brushed() {
 // console.log("currentXScale:")
 // console.log(currentXScale.domain()[1])
 // console.log(currentXScale.domain()[0])
-
+    let formatTime = d3.timeFormat("%M:%S");
+    if (record_dur < 60) {
+        formatTime = d3.timeFormat("%S");
+    }else if(record_dur >3600){
+        formatTime = d3.timeFormat("%H:%M:%S");
+    }
     d3.selectAll(".xAxis")
         .call(d3.axisBottom(currentXScale)
         // .ticks(d3.min(Math.ceil(currentXScale.domain()[1]-currentXScale.domain()[0]),10))
         // .ticks(10)
             .ticks(9)
             .tickFormat(function (d) {
-                return d3.timeFormat('%M:%S')(new Date(0).setSeconds(d))
+                return formatTime(new Date(0).setSeconds(d))
             }));
 
     d3.selectAll(".zoom").call(zoom.transform, d3.zoomIdentity
@@ -1056,9 +1070,11 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
     } else {
         tick_count = 8;
     }
-    var formatTime = d3.timeFormat("%M:%S");
+    let formatTime = d3.timeFormat("%M:%S");
     if (record_dur < 60) {
         formatTime = d3.timeFormat("%S");
+    }else if(record_dur >3600){
+        formatTime = d3.timeFormat("%H:%M:%S");
     }
     xRAW_wide = d3.scaleLinear().domain([0, data.length - 1]).range([0, width]);
 
@@ -1114,7 +1130,7 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
                 .call(d3.axisBottom(xRAW_wide)
                     .ticks(9)
                     .tickFormat(function (d) {
-                        return d3.timeFormat('%M:%S')(new Date(0).setSeconds(d))
+                        return formatTime(new Date(0).setSeconds(d))
                     }));
         }
     } else { //if scrollzoombar already exists:
@@ -1131,7 +1147,7 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
             .call(d3.axisBottom(xRAW_wide)
                 .ticks(9)
                 .tickFormat(function (d) {
-                    return d3.timeFormat('%M:%S')(new Date(0).setSeconds(d))
+                    return formatTime(new Date(0).setSeconds(d))
                 }));
     }
 
@@ -1301,7 +1317,7 @@ function progressZoomed() {
     });
 
     // update all x axis
-    d3.selectAll(".xAxis").call(d3.axisBottom(currentXScale).tickFormat(d3.timeFormat("%d %b - %I:%M")).ticks(7))
+    d3.selectAll(".xAxis").call(d3.axisBottom(currentXScale).tickFormat(d3.timeFormat("%d %b - %H:%M")).ticks(7))
 
 
 }

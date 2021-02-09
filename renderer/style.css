@@ -558,15 +558,8 @@ text{
     background-color: rgba(0,0,0,0.2); /* Green background */
     border: 1px solid #31312f; /* Green border */
     color: lightgray; /* White text */
-    padding: 1.6vh 2.145vw; /* Some padding */
-    cursor: pointer; /* Pointer/hand icon */
-    float: left; /* Float the buttons side by side */
-    margin-left: 2px;
     font-size: 1.04vw;
-    background-color: rgba(0,0,0,0.2);
-    border: 1px solid #31312f;
-    color: lightgray;
-    padding: 1.6vh 2.15vw;
+    padding: 1.6vh 1.05vw;
     cursor: pointer; /* Pointer/hand icon */
     float: left; /* Float the buttons side by side */
     margin-left: 1px;

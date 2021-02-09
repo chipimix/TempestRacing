@@ -409,6 +409,7 @@ function cleanMatchData(){
     focus = [];
     memLoad = [];
     sleepiness = [];
+    document.getElementById('camera').src = "";
 }
 function cleanProgressData(){
     recordsProgress = [];
