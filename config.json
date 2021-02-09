@@ -1,4 +1,5 @@
 {
   "camera": true,
-  "selectedUser": "mastr"
+  "selectedUser": "mastr",
+  "rememberUser": "mastr"
 }

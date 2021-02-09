@@ -106,7 +106,7 @@
 
         <button>Login</button>
         <label>
-<!--            <input type="checkbox" checked="checked" name="remember"> Remember me-->
+            <input type="checkbox"  name="remember" id="rememberMe"> Remember me
         </label>
     </div>
 </form>
@@ -155,7 +155,30 @@
         ipcRenderer.send('lostpw')
     }
 
+    const fs = require('fs');
+    fs.readFile('config.json', (err, data) => {
+        if (err) throw err;
+        let rememberUser = JSON.parse(data).rememberUser;
+        if (rememberUser.length>0){
+            document.getElementById("un").value = rememberUser;
+            document.getElementById('rememberMe').checked = true;
+            document.getElementById("pw").focus();
+        }
+    });
+    document.getElementById('rememberMe').onclick = function() {
+        if ( this.checked ) {
+            const fileName = '../config.json';
+            const file = require(fileName);
+            file.rememberUser = document.getElementById('un').value;
+            console.log(this.value)
 
+            fs.writeFile('config.json', JSON.stringify(file), function writeJSON(err) {
+                if (err) return console.log(err);
+                console.log(JSON.stringify(file));
+                console.log('writing to ' + fileName);
+            });
+        }
+    }
 </script>
 </body>
 </html>

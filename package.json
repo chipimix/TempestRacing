@@ -1,6 +1,6 @@
 {
-  "name": "Tempest",
-  "version": "0.6.5",
+  "name": "Tempest Racing",
+  "version": "0.6.8",
   "description": "Tame thee tempestuous self.",
   "main": "Tempest.js",
   "scripts": {
