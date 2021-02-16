@@ -1,4 +1,10 @@
-
+@font-face {
+    font-family: 'OpenSans-Bold';
+    font-weight: bold;
+    src:
+            local('OpenSans-Bold'),
+            url(../fonts/OpenSans-Bold.ttf) format('truetype');
+}
 #summary{
     width:100vw;
     padding-bottom: 30px;
@@ -15,13 +21,6 @@
 svg{
     margin-bottom:5px;
     background-color: #FAFAFA;
-}
-@font-face {
-    font-family: 'OpenSans-Bold';
-    font-weight: bold;
-    src:
-            local('OpenSans-Bold'),
-            url(../fonts/OpenSans-Bold.ttf) format('truetype');
 }
 div{
     font-family: OpenSans-Bold;

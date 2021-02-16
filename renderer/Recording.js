@@ -15,11 +15,10 @@ const eeg = require('../scripts/eeg');
 const ppg = require('../scripts/ppg');
 const sig = require('../scripts/signal');
 const inputInteraction = require('../scripts/clickStrokes')
-// const videoProcessing = require('../scripts/videoProcessing')
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 var aux = "";
-// var workingDir = require('electron').remote.app.getAppPath().slice(0,-19); //compiled
-var workingDir = require('electron').remote.app.getAppPath();
+var workingDir = require('electron').remote.app.getAppPath().slice(0,-19); //compiled
+// var workingDir = require('electron').remote.app.getAppPath();
 var racerList = ["racer0","racer1","racer2","racer3","racer4"];
 var liveRec = false;
 var recordName = "";
@@ -514,7 +513,7 @@ function handleProgressHistoryMouseMove(d,i){
         let matchApm = progressData[timeStamp].apm;
         let duration = progressData[timeStamp].duration;
 
-        document.getElementById("progressInspector").innerHTML = "<p style='    font-weight: bolder;text-align: center;font-size: x-large;margin: 1% 0%;'> GAME RECAP</p>"+
+        document.getElementById("progressInspector").innerHTML = "<p style='    font-weight: bolder;text-align: center;font-size: x-large;margin: 1% 0%;'> RACE RECAP</p>"+
             "<p>"+date+"</p>"+
             "<p>Duration............ "+parseInt(duration)+" min</p>"+
             "<p>User................ "+username+"</p>"+
@@ -748,7 +747,7 @@ function gameReport(){
                         let matchFatigue = progressData[timeStamp].fatigue*100;
                         let matchApm = progressData[timeStamp].apm;
 
-                        document.getElementById("progressInspector").innerHTML = "<p style='    font-weight: bolder;text-align: center;font-size: x-large;margin: 1% 0%;'>GAME RECAP</p>"+
+                        document.getElementById("progressInspector").innerHTML = "<p style='    font-weight: bolder;text-align: center;font-size: x-large;margin: 1% 0%;'>RACE RECAP</p>"+
                             "<p>"+date+"</p>"+
                             "<p>Duration............ "+parseInt(duration)+" min</p>"+
                             "<p>User................ "+username+"</p>"+

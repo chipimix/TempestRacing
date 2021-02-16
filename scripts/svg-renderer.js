@@ -208,8 +208,9 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
                 .attr("stop-color", function(d) { return d.color; });
             color = 'url(#yesThisIsEngagementGradient)';
         }
+    }else if (svg_id == "#CHART2") {
+            color = "#d31359"
     }
-
     if (d3.select(svg_id).select("g").empty()) { //if there was no linechart plotted beforehand
         //create g with transform for axis labels and title
         var svg = d3.select(svg_id).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").style("color", color);
@@ -226,7 +227,7 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(xScale).ticks(9)
                 .tickFormat(function (d) {
-                    return formatTime(new Date(0).setSeconds(d))
+                    return formatTime(d3.timeHour.offset( new  Date(0),-1).setSeconds(d))
                 }));
         //append y axis
         svg.append("g")
@@ -237,6 +238,7 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
             .attr("y", "-1em")
             .attr("x", "-2.7em")
             .attr("text-anchor", "start")
+            .attr("id",svg_id.slice(1)+"Units")
             .text(yUnits);
         // append svg path element describing our line:
         svg.append("g")
@@ -259,11 +261,12 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
             .call(d3.axisBottom(xScale).ticks(9)
                 .tickFormat(function (d) {
 
-                    return formatTime(new Date(0).setSeconds(d))
+                    return formatTime(d3.timeHour.offset( new  Date(0),-1).setSeconds(d))
                 }));
         //update y axis
         d3.select(svg_id).select(".yAxis")
             .call(d3.axisLeft(d3.scaleLinear().domain(domain).range([height, 0])));
+        d3.select(svg_id+"Units").text(yUnits)
         //erased lines below as we should only need to do this once
         // d3.select("#clip"+svg_id.slice(1))
         //     .select("rect")
@@ -439,7 +442,7 @@ function plotRtLineChart(svg_id, dataset, sampleRate, xxDomainStart = 0, xxDomai
             .attr("fill", "#00ffb0")
             .attr("y", "-1em")
             .attr("dy", "0.71em")
-            .attr("text-anchor", "end")
+            .attr("text-anchor", "start")
             .text("Magnitude");
         // append svg path element describing our line:
         svg.append("g").attr("clip-path", "url(#clip" + svg_id.slice(1) + ")").append("path")
@@ -502,6 +505,24 @@ function plotProgressChart(svg_id, dataset, sampleRate, name = "Chart", width, h
         return d[name];
     })).range([height, 0]);
     let domain = yScale.domain();
+    let yUnits = "Magnitude";
+    switch(name) {
+        case "Heart Rate":
+            yUnits = "BPM";
+            break;
+        case "HRV":
+            yUnits = "Milliseconds";
+            break;
+        case "Creep Score":
+            yUnits = "CSM"
+            break;
+        case "Gold":
+            yUnits = ""
+            break;
+        case "Actions Per Minute":
+            yUnits = "APM"
+            break;
+    }
     if (name == "stress" || name == "engagement" || name == "sleepiness" || name == "focus" || name == "memoryLoad" || name == "mouseMoves") {
         let rescale = d3.scaleLinear().domain(domain).range([0, 100]);
         domain = [rescale(domain[0]), rescale(domain[1])];
@@ -536,8 +557,9 @@ function plotProgressChart(svg_id, dataset, sampleRate, name = "Chart", width, h
             .attr("fill", color)
             .attr("y", "-1.5em")
             .attr("dy", "0.71em")
-            .attr("text-anchor", "end")
-            .text("Magnitude");
+            .attr("text-anchor", "start")
+            .attr("id",svg_id.slice(1)+"Units")
+            .text(yUnits);
         g.append("g")
             .attr("class", "xAxis")
             .attr("transform", "translate(0," + height + ")")
@@ -589,6 +611,8 @@ function plotProgressChart(svg_id, dataset, sampleRate, name = "Chart", width, h
                     return height;
                 }
             })
+        d3.select(svg_id+"Units").text(yUnits)
+
     }
 
 }
@@ -926,13 +950,13 @@ function zoomed() {
         // .ticks(10)
             .ticks(9)
             .tickFormat(function (d) {
-                return formatTime(new Date(0).setSeconds(d))
+                return formatTime(d3.timeHour.offset( new  Date(0),-1).setSeconds(d))
             }));
 
     if(d3.selectAll("#progressInspector p").nodes().length > 0){
         let start = parseInt(currentXScale.domain()[0]);
         let end = parseInt(currentXScale.domain()[1] - 1);
-        d3.selectAll("#progressInspector p").nodes()[2].innerText = "Time Interval....... " + parseInt(start / 60).toString().padStart(2, '0') + ":" + (start % 60).toString().padStart(2, '0') + " ↔ " + parseInt(end / 60).toString().padStart(2, '0') + ":" + (end % 60).toString().padStart(2, '0');
+        d3.selectAll("#progressInspector p").nodes()[2].innerText = "Time Interval....... " + parseInt(start / 60).toString().padStart(2, '0') + ":" + (start % 60).toString().padStart(2, '0') + "↔" + parseInt(end / 60).toString().padStart(2, '0') + ":" + (end % 60).toString().padStart(2, '0');
         // d3.selectAll("#progressInspector p").nodes()[8].innerText = "Actions Per Minute.. " + (d3.mean(apm.slice(start, end))).toFixed(2);
         if (engagement.length > 0) {
             let meanEngagement = d3.mean(engagement.slice(start, end));
@@ -1037,7 +1061,7 @@ function brushed() {
         // .ticks(10)
             .ticks(9)
             .tickFormat(function (d) {
-                return formatTime(new Date(0).setSeconds(d))
+                return formatTime(d3.timeHour.offset( new  Date(0),-1).setSeconds(d))
             }));
 
     d3.selectAll(".zoom").call(zoom.transform, d3.zoomIdentity
@@ -1079,7 +1103,7 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
     xRAW_wide = d3.scaleLinear().domain([0, data.length - 1]).range([0, width]);
 
     brush = d3.brushX()
-        .extent([[0, 0], [window.innerWidth, height * 0.24]])
+        .extent([[0, 0], [window.innerWidth*0.95, height * 0.24]])
         // line below TLDR: if you want to pass a callback, you have to pass a function, not call a function :)
         .on("brush end", function () {
             brushed();
@@ -1120,7 +1144,7 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
         scrollZoomBar.append("g")
             .attr("class", "brush")
             .call(brush)
-            .call(brush.move, window.innerWidth);
+            .call(brush.move, window.innerWidth*0.95);
         if (d3.select("#scrollBarContainer").select(".axis").empty()) {
             console.log("scrollzoombar axis is empty")
             scrollZoomBar.append("g")
@@ -1130,7 +1154,7 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
                 .call(d3.axisBottom(xRAW_wide)
                     .ticks(9)
                     .tickFormat(function (d) {
-                        return formatTime(new Date(0).setSeconds(d))
+                        return formatTime(d3.timeHour.offset( new  Date(0),-1).setSeconds(d))
                     }));
         }
     } else { //if scrollzoombar already exists:
@@ -1142,12 +1166,12 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
         console.log("scrollzoombar already exists; initial brush width ="+window.innerWidth);
         scrollZoomBar.select(".brush")
             .call(brush)
-            .call(brush.move, window.innerWidth);
+            .call(brush.move, window.innerWidth*0.95);
         d3.select("#scrollBarContainer").select(".axis")
             .call(d3.axisBottom(xRAW_wide)
                 .ticks(9)
                 .tickFormat(function (d) {
-                    return formatTime(new Date(0).setSeconds(d))
+                    return formatTime(d3.timeHour.offset( new  Date(0),-1).setSeconds(d))
                 }));
     }
 

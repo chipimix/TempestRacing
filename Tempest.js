@@ -28,13 +28,15 @@ function createMenuWindow(tok) {
         file: 'renderer/Recording.html',
         width: 1280,
         height: 720,
+        resizable:false,
+        webPreferences: { enableRemoteModule: true, backgroundThrottling:false }
     });
-    mainWindow.on('resize', function () {
-        setTimeout(function () {
-            var size = mainWindow.getSize();
-            mainWindow.setSize(size[0], parseInt(size[0] * 9 / 16));
-        }, 0);
-    });
+    // mainWindow.on('resize', function () {
+    //     setTimeout(function () {
+    //         var size = mainWindow.getSize();
+    //         mainWindow.setSize(size[0], parseInt(size[0] * 9 / 16));
+    //     }, 0);
+    // });
     mainWindow.once('ready-to-show', () => {
         mainWindow.show()
         console.log("sending usr-tok with:" + tok)
@@ -64,7 +66,7 @@ function createLoginWindow(){
         height:648,
         // alwaysOnTop: true,
         resizable:false,
-        backgroundColor: '#1A1C20'
+        backgroundColor: '#1A1C20',
     }   );
     loginWindow.once('ready-to-show', () => {
         loginWindow.show()

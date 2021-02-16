@@ -528,7 +528,7 @@ text{
     background-color: rgba(0,0,0,0.7);
     font-family: monospace;
     color: lightgray;
-    font-size: 1vw;
+    font-size: 1.1vw;
 }
 #progressInspector p{
     margin: 0;
