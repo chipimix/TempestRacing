@@ -19,7 +19,6 @@ const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 var aux = "";
 var workingDir = require('electron').remote.app.getAppPath().slice(0,-19); //compiled
 // var workingDir = require('electron').remote.app.getAppPath();
-var racerList = ["racer0","racer1","racer2","racer3","racer4"];
 var liveRec = false;
 var recordName = "";
 var recordId;
@@ -98,7 +97,8 @@ var tok="";
 var userId=0;
 var racerList=[];
 var orgId=0;
-var org={}
+var org={};
+let logName ="";
 ipcRenderer.on('set-version', (event, arg) => {
     console.log("version = "+ arg);
     const versionSpan = document.getElementById('versionSpan')
@@ -109,8 +109,11 @@ ipcRenderer.send('get-version')
 ipcRenderer.on('usr-tok', function (event,datum) {
     tok=datum.token;
     userId=datum.userId;
+    logName = datum.userId;
+    if(username.length==0){
+        username = datum.username;
+    }
     getOrg();
-
     checkLogs();
 });
 

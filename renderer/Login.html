@@ -133,7 +133,7 @@
         request.post({url:'http://emotai.him3efvi97.eu-west-1.elasticbeanstalk.com/home/giefToken/', form: {username:document.getElementById("un").value, password:document.getElementById("pw").value}}, function(err,httpResponse,body){
             // console.log(err);
             let response = JSON.parse(body);
-            console.log(response);
+            console.log(response)
             if(typeof response['non_field_errors'] !== 'undefined'){
                 console.log("username & password ain't working proper");
                 document.getElementById('pw').style.backgroundColor="darkgray";
@@ -141,10 +141,21 @@
                 document.getElementById("pw").value = ""
             }else if(typeof response['token'] !== 'undefined'){
                 const {ipcRenderer } = require('electron');
-                ipcRenderer.send('loginSuccessful',{token:response['token'],userId:response['user_id']})
+                ipcRenderer.send('loginSuccessful',{token:response['token'],userId:response['user_id'],username:document.getElementById("un").value})
             }
 
         });
+        if ( document.getElementById('rememberMe').checked ) {
+            const fileName = '../config.json';
+            const file = require(fileName);
+            file.rememberUser = document.getElementById('un').value;
+            console.log(this.value)
+            fs.writeFile('config.json', JSON.stringify(file), function writeJSON(err) {
+                if (err) return console.log(err);
+                console.log(JSON.stringify(file));
+                console.log('writing to ' + fileName);
+            });
+        }
     }
     function signup(){
         const {ipcRenderer } = require('electron');
