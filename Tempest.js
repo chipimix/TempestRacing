@@ -92,6 +92,7 @@ function createLoginWindow(){
 }
 
 function createExportReportWindow(arg){
+    console.log("createExportReportWindow!")
     let exportWindow = new Window({
         file: 'renderer/ExportReport.html',
         width:764,
@@ -105,12 +106,17 @@ function createExportReportWindow(arg){
     exportWindow.setMenuBarVisibility(false)
     exportWindow.once('ready-to-show', () => {
         exportWindow.show()
-        console.log(arg)
+        // console.log(arg)
         exportWindow.webContents.send('reportData', arg);
 
     });
-
+    ipcMain.removeAllListeners('print');
     ipcMain.on('print',()=>{
+        console.log("print")
+        console.log(exportWindow)
+        console.log("------------------------")
+        console.log(exportWindow.webContents)
+        console.log("^^^^^^^^^^^^^^^^^^^^^^^^")
         // const electron = require('electron');
         // const BrowserWindow = electron.remote.BrowserWindow;
         // var filepath = 'C:\\Users\\danielRocha\\Desktop\\print1.pdf';
@@ -121,17 +127,8 @@ function createExportReportWindow(arg){
             printSelectionOnly: false,
             landscape: false
         }
-        // let win = BrowserWindow.getFocusedWindow();
-        // electron.remote.getCurrentWebContents().print();
         exportWindow.webContents.print();
-        // exportWindow.webContents.printToPDF({}).then(data => {
-        //     fs.writeFile('C:\\Users\\danielRocha\\Desktop\\readings', data, (error) => {
-        //         if (error) throw error
-        //         console.log(`Wrote PDF successfully`)
-        //     })
-        // }).catch(error => {
-        //     console.log(`Failed to write PDF `)
-        // })
+
     })
 
 }

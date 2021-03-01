@@ -17,8 +17,8 @@ const sig = require('../scripts/signal');
 const inputInteraction = require('../scripts/clickStrokes')
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 var aux = "";
-var workingDir = require('electron').remote.app.getAppPath().slice(0,-19); //compiled
-// var workingDir = require('electron').remote.app.getAppPath();
+// var workingDir = require('electron').remote.app.getAppPath().slice(0,-19); //compiled
+var workingDir = require('electron').remote.app.getAppPath();
 var liveRec = false;
 var recordName = "";
 var recordId;
@@ -212,9 +212,9 @@ communicationEmitter.on('rawDataUpdate', (arg) => {
             heartRate.push(aux.hr);
             hrv.push(aux.hrv);
             ppgRed = aux.outFiltered;
-            console.log(inputInteraction.getAPM())
-            console.log(inputInteraction.getMPM())
-            console.log(inputInteraction.getFatigue())
+            // console.log(inputInteraction.getAPM())
+            // console.log(inputInteraction.getMPM())
+            // console.log(inputInteraction.getFatigue())
             fs.appendFile('readings/'+ recordName+"_derived.csv",
                 [brainMetrics.engagement,brainMetrics.stress,brainMetrics.valence,aux.hr,aux.hrv,inputInteraction.getAPM().slice(-1),inputInteraction.getMPM().slice(-1),inputInteraction.getFatigue().slice(-1),brainMetrics.sleepiness,brainMetrics.focus,brainMetrics.memLoad].toString()+"\n",
                 function (err){if(err) throw err;});

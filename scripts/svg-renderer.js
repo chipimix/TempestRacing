@@ -52,9 +52,9 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
             break;
     }
     if(color === 'gradient'){
-        console.log("plot with gradient")
+        // console.log("plot with gradient")
         if (name === "Emotional Valence") {
-            console.log("metric = emo val")
+            // console.log("metric = emo val")
             domain = [-1, 1];
             d3.select(svg_id).append("linearGradient")
                 .attr("id", "yesThisIsEmoValGradient")
@@ -75,7 +75,7 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
         } else if (name === "Heart Rate" || name === "Creep Score" || name === "Gold" || name === "Actions Per Minute" || name === "HRV") {
             domain = [d3.min(dataset), d3.max(dataset)];
             if(name === "Heart Rate"){
-                console.log("metric = hr")
+                // console.log("metric = hr")
 
                 d3.select(svg_id).append("linearGradient")
                     .attr("id", "yesThisIsHRGradient")
@@ -98,7 +98,7 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
                 color = 'url(#yesThisIsHRGradient)'
                 yUnits = "Beats per minute"
             }else if(name === 'HRV'){
-                console.log("metric = hrv")
+                // console.log("metric = hrv")
 
                 d3.select(svg_id).append("linearGradient")
                     .attr("id", "yesThisIsHRVGradient")
@@ -122,7 +122,7 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
                 yUnits = "Milliseconds"
             }
         }else if(name === "Stress"){
-            console.log("metric = stress")
+            // console.log("metric = stress")
 
             d3.select(svg_id).append("linearGradient")
                 .attr("id", "yesThisIsStressGradient")
@@ -144,7 +144,7 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
                 .attr("stop-color", function(d) { return d.color; });
             color = 'url(#yesThisIsStressGradient)'
         }else if(name === "MemLoad"){
-            console.log("metric = mem load")
+            // console.log("metric = mem load")
 
             d3.select(svg_id).append("linearGradient")
                 .attr("id", "yesThisIsMemLoadGradient")
@@ -166,7 +166,7 @@ function plotLineChart(svg_id, dataset, sampleRate, name = "Chart", width, heigh
                 .attr("stop-color", function(d) { return d.color; });
             color = 'url(#yesThisIsMemLoadGradient)'
         }else if(name === "Sleepiness"){
-            console.log("metric = sleepiness")
+            // console.log("metric = sleepiness")
 
             d3.select(svg_id).append("linearGradient")
                 .attr("id", "yesThisIsSleepGradient")
@@ -636,7 +636,7 @@ function plotPpgLiveAnimation(svg_id, dataset, sampleRate, hr, xxDomainStart = 0
         yyDomainEnd++;
     }
     var width = d3.select(svg_id).node().clientWidth;
-        console.log("width: " + width);
+        // console.log("width: " + width);
     var height = d3.select(svg_id).node().clientHeight;
 
 // setup scales
@@ -932,7 +932,7 @@ function zoomed() {
 
 
         d3.select("#" + id).select(".yAxis").call(d3.axisLeft(d3.scaleLinear().domain(domain).range([0, height])));
-        console.log("zoomed yAxis domain = "+domain)
+        // console.log("zoomed yAxis domain = "+domain)
     });
 
     d3.selectAll(".brush").call(brush.move, xRAW_wide.range().map(t.invertX, t));
@@ -1038,7 +1038,7 @@ function brushed() {
 
 
         d3.select("#" + id).select(".yAxis").call(d3.axisLeft(d3.scaleLinear().domain(domain).range([0, height])));
-        console.log("brushed yAxis domain = "+domain)
+        // console.log("brushed yAxis domain = "+domain)
     });
 
 
@@ -1125,7 +1125,7 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
     var scrollZoomBar;
     //if scrollzoombar doesn't exist:
     if (d3.select("#tinyLine" + svgName.slice(1)).empty()) {
-        console.log("scrollzoombar doesn't exist")
+        // console.log("scrollzoombar doesn't exist")
 
         //append g
         scrollZoomBar = d3.select("#scrollBarContainer").append("g")
@@ -1140,13 +1140,13 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
             .attr("fill", "none")
             .attr("d", tinyLine(data));
 
-        console.log("scrollzoombar doesn't  exists; initial brush width ="+window.innerWidth);
+        // console.log("scrollzoombar doesn't  exists; initial brush width ="+window.innerWidth);
         scrollZoomBar.append("g")
             .attr("class", "brush")
             .call(brush)
             .call(brush.move, window.innerWidth*0.95);
         if (d3.select("#scrollBarContainer").select(".axis").empty()) {
-            console.log("scrollzoombar axis is empty")
+            // console.log("scrollzoombar axis is empty")
             scrollZoomBar.append("g")
                 .attr("class", "axis")
                 .attr("transform", "translate(0," + height * 0.24 + ")").style("color", "#00ffb0")
@@ -1158,12 +1158,12 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
                     }));
         }
     } else { //if scrollzoombar already exists:
-        console.log("scrollzoombar already exists")
+        // console.log("scrollzoombar already exists")
 
         scrollZoomBar = d3.select("#scrollBarContainer").select("g");
         d3.select("#tinyLine" + svgName.slice(1))
             .attr("d", tinyLine(data));
-        console.log("scrollzoombar already exists; initial brush width ="+window.innerWidth);
+        // console.log("scrollzoombar already exists; initial brush width ="+window.innerWidth);
         scrollZoomBar.select(".brush")
             .call(brush)
             .call(brush.move, window.innerWidth*0.95);
@@ -1187,7 +1187,7 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
                 let screen = document.getElementById('screen');
                 if (mediaState == "inspector") {
                     mediaState = "replay";
-                    console.log(screen.currentTime)
+                    // console.log(screen.currentTime)
                     screen.addEventListener('timeupdate', () => {
                         highlightLineChart(parseInt(screen.currentTime))
                     });
@@ -1232,9 +1232,9 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
 
     d3.select("#scrollBarContainer").style("display","block");
     d3.select("#historyDomain").style("display","none");
-    console.log('\n' +
-         '    d3.select("#scrollBarContainer").style("display","block");\n' +
-        '    d3.select("#historyDomain").style("display","none");')
+    // console.log('\n' +
+    //      '    d3.select("#scrollBarContainer").style("display","block");\n' +
+    //     '    d3.select("#historyDomain").style("display","none");')
 }
 
 /**
@@ -1248,12 +1248,12 @@ function plotScrollZoomBar(svgName, data, line, lineColor, width, height) {
 function plotProgressScrollZoomBar(svgName, data, metricName, line, lineColor, width, height,xxDomain) {
     var height = 133.84976;
     var width = 1215;
-    console.log("plotProgressScrollZoomBar! height= "+height+"  ,width= "+width);
+    // console.log("plotProgressScrollZoomBar! height= "+height+"  ,width= "+width);
     if (typeof xxDomain === "undefined") xxDomain=d3.extent(recordsProgress)
     // console.log("new zoom with scale = "  +xxDomain);
     xRAW_wide = d3.scaleLinear().domain(xxDomain).range([5, width-5]);
     currentXScale = d3.scaleTime().domain(xxDomain).range([5, width-5]);
-    console.log(currentXScale.domain(),currentXScale.range())
+    // console.log(currentXScale.domain(),currentXScale.range())
     // if (!d3.select("#tinyLine" + svgName.slice(1)).empty()){
     //     d3.select("#tinyLine" + svgName.slice(1)).remove();
     // }
@@ -1660,7 +1660,7 @@ function svgDropDown(options, defaultMetric, container, color) {
     }
 
     function handleSelectClick() {
-        console.log("handleSelectClick")
+        // console.log("handleSelectClick")
         d3.event.stopPropagation();
         const visibility = optionGroup.attr("display") === "block" ? "none" : "block";
         if (visibility === "block") {
@@ -1674,7 +1674,7 @@ function svgDropDown(options, defaultMetric, container, color) {
 
 // wraps words
     function wrap() {
-        console.log("wrap")
+        // console.log("wrap")
         const width = options.width;
         const padding = options.padding;
         const self = d3.select(this);
@@ -1771,8 +1771,8 @@ function highlightLineChart(timeStamp) {
                 .attr("cx", x)
                 .attr("cy", y);
             let coord = plotHighlightCircles(line, d3.select("#circle" + id), true);
-            console.log("coord = "+coord)
-            console.log("range = "+range)
+            // console.log("coord = "+coord)
+            // console.log("range = "+range)
             let val = (d3.scaleLinear().domain([d3.min(data), d3.max(data)]).range(range)(data[timeStamp])).toFixed(0)
             g.append("text")
                 .text(function () {
